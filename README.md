@@ -43,7 +43,7 @@ json_decode(input, m);
 ```
 
 The library also provides a non intrusive way to de/serialize any C++ objects. Since the library
-has no way to introsect your object, you must pass it the description of your object :
+has no way to introspect your object, you must pass it the description of your object :
 
 ```c++
 struct A { int age; std::string name; };
