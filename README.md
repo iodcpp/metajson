@@ -14,6 +14,9 @@ While being easier and safer to use. The big difference of iod::metajson over
 other serialization libraries is that it does not rely on a dynamic hashtable
 to store the objects, but on plain static C++ objects.
 
+*Limitation:* metajson only handles JSON objects with a *static structure known at compile time*.
+
+
 Overview
 ============================
 
