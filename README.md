@@ -34,9 +34,8 @@ std::string input = R"json({"test1":12,"test2":"John"})json";
 std::string str = json_decode(input, str);
 ```
 
-The library also provides a non intrusive way to serialize any C++ objects. The structure
-of the object to de/serialize is given to the library via the use of symbols, matching
-the object member or accessors names:
+The library also provides a non intrusive way to de/serialize any C++ objects. Since the library
+has no way to introsect your object, you need must pass it the description of your object :
 
 ```c++
 struct A { int age; std::string name; };
@@ -44,6 +43,7 @@ struct A { int age; std::string name; };
 A obj{12, "John"};
 std::string str = json_object(_age, _name).encode(obj);
 ```
+([More on symbols and how we access objects here](https://github.com/iodcpp/symbol))
 
 And also to deserialize them:
 
@@ -65,6 +65,12 @@ std::vector<A> array;
 json_object(_age, _name, _parents = json_array(_age, _name)).decode(input, obj);
 ```
 
+
+If the member of the object does not match a given JSON key, you can
+specify it with the json_key attribute in the description of your object:
+
+json_object(_age,
+            _name(json_key("last_name")))
 
 Roadmap
 =================
