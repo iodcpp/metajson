@@ -77,13 +77,8 @@ namespace iod
           else
             json_encode_value(ss, symbol_member_access(obj, e.name));
         };
-      
-      auto encode_members = [&] (auto... e)
-        {
-          apply_each(encode_one_entity, e...);
-        };
 
-      std::experimental::apply(encode_members, schema.members);
+      tuple_apply_each(encode_one_entity, schema.members);
       ss << '}';
     }
   }
