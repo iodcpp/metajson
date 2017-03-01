@@ -32,14 +32,14 @@ IOD_SYMBOL(_name)
 IOD_SYMBOL(_age)
 
 auto m = make_metamap(_name = "John", _age = 12);
-std::string str = json_encode(str);
+std::string str = json_encode(m);
 ```
 
 And also to decode:
 
 ```c++
 std::string input = R"json({"test1":12,"test2":"John"})json";
-std::string str = json_decode(input, str);
+json_decode(input, m);
 ```
 
 The library also provides a non intrusive way to de/serialize any C++ objects. Since the library
