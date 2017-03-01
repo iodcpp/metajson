@@ -9,29 +9,6 @@
 namespace iod
 {
 
-  // Frontend.
-  // json_object(...).decode(input, obj);
-  // json_object(...).decode(input);
-
-  // json_object(...).encode(output, obj);
-  // json_object(...).encode(output, map);
-
-  // json_object(...).encode(obj) -> string;
-  // json_object(...).encode(map) -> string;
-  
-  // json_decode(input, map);
-  // json_encode(ouput, map);
-  // json_encode(map) -> string
-
-
-  // Backend.
-  // json_encode(output_stream, obj, members);
-  // json_decode(output_stream, obj, members);
-
-  // metamap_to_json_object
-  // json_object_to_metamap
-  // make_json_object_member OK.
-
   template <typename ...Ms>
   struct metamap;
   
