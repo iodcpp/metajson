@@ -7,13 +7,12 @@ serializer/deserializer. The goal is to get as fast as a non-generic
 specialized hand-written serializer, for example:
 
 ```c++
-printf("{"name":"%s","age":%i}", a.name, a.age);
+printf("{\"name\":\"%s\",\"age\":%i}", a.name, a.age);
 ```
 
 While being easier and safer to use. The big difference of iod::metajson over
 other serialization libraries is that it does not rely on a dynamic hashtable
-to store the objects.
-
+to store the objects, but on plain static C++ objects.
 
 Overview
 ============================
@@ -35,7 +34,9 @@ std::string input = R"json({"test1":12,"test2":"John"})json";
 std::string str = json_decode(input, str);
 ```
 
-The library also provides a non intrusive way to serialize any C++ objects:
+The library also provides a non intrusive way to serialize any C++ objects. The structure
+of the object to de/serialize is given to the library via the use of symbols, matching
+the object member or accessors names:
 
 ```c++
 struct A { int age; std::string name; };
