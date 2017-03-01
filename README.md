@@ -35,7 +35,7 @@ std::string str = json_decode(input, str);
 ```
 
 The library also provides a non intrusive way to de/serialize any C++ objects. Since the library
-has no way to introsect your object, you need must pass it the description of your object :
+has no way to introsect your object, you must pass it the description of your object :
 
 ```c++
 struct A { int age; std::string name; };
@@ -50,7 +50,6 @@ And also to deserialize them:
 ```c++
 json_object(_age, _name).decode(input, obj);
 ```
-
 
 Vectors are also easy to handle:
 
@@ -69,8 +68,10 @@ json_object(_age, _name, _parents = json_array(_age, _name)).decode(input, obj);
 If the member of the object does not match a given JSON key, you can
 specify it with the json_key attribute in the description of your object:
 
+```c++
 json_object(_age,
             _name(json_key("last_name")))
+```
 
 Roadmap
 =================
