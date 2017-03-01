@@ -1,21 +1,31 @@
 #pragma once
 
 #include <iod/metamap/metamap.hh>
+#include <iod/metajson/symbols.hh>
 #include <iod/symbol/ast.hh>
-#include <tuple>
+#include <experimental/tuple>
 
 namespace iod
 {
 
   template <typename T>
   struct json_object_;
-
+  struct json_key;
+  
   namespace impl
   {
+    template <typename S, typename... A>
+    auto make_json_object_member(const function_call_exp<S, A...>& e);
+    template <typename S>
+    auto make_json_object_member(const symbol<S>&);
+
     template <typename S, typename T>
     auto make_json_object_member(const assign_exp<S, T>& e)
     {
-      return make_metamap(_name = e.left, _type = e.right);
+
+      return cat(make_json_object_member(e.left),
+                 make_metamap(_type = e.right));
+
     }
 
     template <typename S>
@@ -48,12 +58,21 @@ namespace iod
       return std::experimental::apply(make_metamap, kvs);
     }
 
-    // template <typename S, typename... A>
-    // auto make_json_object_member(const function_call_exp<S, A...>& e);
-    // {
-      // FIXME
-      // return make_metamap(_name = e);
-    // }
+    template <typename S, typename... A>
+    auto make_json_object_member(const function_call_exp<S, A...>& e)
+    {
+      auto res = make_metamap(_name = e.method, _json_key = symbol_string(e.method));
+
+      auto parse = [&] (auto a)
+        {
+          if constexpr(std::is_same<decltype(a), json_key>::value) {
+              res.json_key = a.key;
+            }
+        };
+
+      tuple_apply_each(parse, e.args);
+      return res;
+    }
     
   }
 

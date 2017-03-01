@@ -2,6 +2,7 @@
 
 #include <sstream>
 
+#include <iod/metajson/decoder.hh>
 #include <iod/metajson/encoder.hh>
 #include <iod/metajson/utils.hh>
 
@@ -68,19 +69,19 @@ namespace iod
       return ss.str();
     }
       
-    // template <typename C, typename O>
-    // void decode(C& input, O& obj) const
-    // {
-    //   return impl::json_decode(input, std::forward<O>(obj), members);
-    // }
+    template <typename C, typename O>
+    void decode(C& input, O& obj) const
+    {
+      return impl::json_decode(input, obj, *this);
+    }
 
-    // template <typename C, typename... M>
-    // auto decode(C& input) const
-    // {
-    //   auto map = impl::json_object_to_metamap(*this);
-    //   impl::json_decode(input, map, members);
-    //   return map;
-    // }
+    template <typename C, typename... M>
+    auto decode(C& input) const
+    {
+      auto map = impl::json_object_to_metamap(*this);
+      impl::json_decode(input, map, *this);
+      return map;
+    }
 
     T members;
   };
@@ -104,12 +105,18 @@ namespace iod
     auto obj = json_object(std::forward<S>(s)...);
     return json_vector_<decltype(obj)>{obj};
   }
+
+  struct json_key
+  {
+    inline json_key(const char* c) : key(c) {}
+    const char* key;
+  };
   
-  // template <typename C, typename... M>
-  // auto json_decode(C& input, metamap<M...>& map)
-  // {
-  //   impl::metamap_to_json_object(map).decode(input, map);
-  // }
+  template <typename C, typename... M>
+  auto json_decode(C& input, metamap<M...>& map)
+  {
+    impl::metamap_to_json_object(map).decode(input, map);
+  }
 
   template <typename C, typename... M>
   auto json_encode(C& output, metamap<M...>& map)

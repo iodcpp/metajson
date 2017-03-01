@@ -14,7 +14,12 @@ While being easier and safer to use. The big difference of iod::metajson over
 other serialization libraries is that it does not rely on a dynamic hashtable
 to store the objects, but on plain static C++ objects.
 
-**Limitation:** metajson only handles JSON objects with a **static structure known at compile time**.
+**Limitation:** metajson only handles JSON objects with a **static
+  structure known at compile time**.
+
+This is a work in progress. All the features described here are
+working well, but more work need to be done to optimize string
+formating/parsing and to support UTF8.
 
 
 Overview
@@ -72,11 +77,11 @@ If the member of the object does not match a given JSON key, you can
 specify it with the json_key attribute in the description of your object:
 
 ```c++
-json_object(_age,
-            _name(json_key("last_name")))
+json_object(_age, _name(json_key("last_name")))
 ```
 
 Roadmap
 =================
 
 - Encode and decode UTF8
+- Replace std::stringstream with a faster alternative

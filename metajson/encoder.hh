@@ -60,7 +60,11 @@ namespace iod
         {
           if (!first) { ss << ','; }
           first = false; 
-          json_encode_value(ss, symbol_string(e.name));
+          if constexpr(has_key(e, _json_key)) {
+              json_encode_value(ss, e.json_key);
+            }
+          else
+            json_encode_value(ss, symbol_string(e.name));
           ss << ':';
 
           if constexpr(has_key(e, _type)) {
