@@ -38,7 +38,7 @@ std::string str = json_encode(m);
 And also to decode:
 
 ```c++
-std::string input = R"json({"test1":12,"test2":"John"})json";
+std::string input = R"json({"age":12,"name":"John"})json";
 json_decode(input, m);
 ```
 
