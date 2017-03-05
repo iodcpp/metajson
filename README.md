@@ -19,7 +19,10 @@ to store the objects, but on plain static C++ objects.
 
 This is a work in progress. All the features described here are
 working well, but more work need to be done to optimize string
-formating/parsing and to support UTF8.
+formating/parsing.
+
+iod::metajson properly handle decoding and encoding UTF-8 but not the
+others UTF-{32|16} {big|little} endian encodings.
 
 
 Overview
@@ -83,5 +86,4 @@ json_object(_age, _name(json_key("last_name")))
 Roadmap
 =================
 
-- Encode and decode UTF8
 - Replace std::stringstream with a faster alternative
