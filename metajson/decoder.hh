@@ -3,6 +3,7 @@
 #include <experimental/string_view>
 #include <iod/metamap/metamap.hh>
 #include <iod/metajson/utils.hh>
+#include <iod/metajson/unicode.hh>
 
 namespace iod
 {
@@ -56,26 +57,7 @@ namespace iod
 
       inline void fill(std::string& str)
       {
-        eat('"');
-        while (true)
-        {
-          while (!ss.eof() and ss.peek() != '"')
-            str.push_back(ss.get());
-
-          // Count the prev backslashes.
-          int end = str.size();
-          int sb = end - 1;
-          while (sb >= 0 and str[sb] == '\\')
-            sb--;
-
-          int number_of_backslashes = end - sb - 1;
-
-          // If an even nomber of backslash, the double quote is not escaped.
-          if (!(number_of_backslashes % 2)) break;
-          else // double quote is escaped, add it to the string and continue.
-            str.push_back(ss.get()); // Add the 
-        }
-        eat('"');
+        json_to_utf8(ss, str);
       }
       
       std::stringstream ss;

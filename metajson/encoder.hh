@@ -6,6 +6,7 @@
 #include <iod/symbol/symbol.hh>
 #include <iod/metajson/symbols.hh>
 #include <iod/metajson/utils.hh>
+#include <iod/metajson/unicode.hh>
 
 namespace iod
 {
@@ -26,13 +27,13 @@ namespace iod
     inline void json_encode_value(C& ss, const T& t) { ss << t; }
 
     template <typename C>
-    inline void json_encode_value(C& ss, const char* s) { ss << '"' << s << '"'; }
+    inline void json_encode_value(C& ss, const char* s) { utf8_to_json(s, ss); }
 
     template <typename C>
-    inline void json_encode_value(C& ss, const string_view& s) { ss << '"' << s << '"'; }
+    inline void json_encode_value(C& ss, const string_view& s) { utf8_to_json(s, ss); }
     
     template <typename C>
-    inline void json_encode_value(C& ss, const std::string& s) { ss << '"' << s << '"'; }
+    inline void json_encode_value(C& ss, const std::string& s) { utf8_to_json(s, ss); }
 
     template <typename C, typename O, typename E>
     inline void json_encode(C& ss, O obj, const json_object_<E>& schema);

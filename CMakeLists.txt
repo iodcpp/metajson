@@ -12,6 +12,9 @@ add_test(json_decode json_decode)
 add_executable(json_encode tests/encode.cc)
 add_test(json_encode json_encode)
 
+add_executable(json_unicode tests/unicode.cc)
+add_test(json_unicode json_unicode)
+
 install(DIRECTORY metajson DESTINATION include/iod
   FILES_MATCHING PATTERN "*.hh")
 install(DIRECTORY metajson DESTINATION include/iod
