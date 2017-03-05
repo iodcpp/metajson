@@ -164,15 +164,6 @@ int main()
     assert(out == "");
   }
 
-
-  { // Unicode ASCII
-    std::string out;
-    std::stringstream stream(R"("\u0001")");
-    auto err = iod::json_to_utf8(stream, out);
-    assert(err.code == 0);
-    assert(out == "\x01");
-  }
-
   // lowercase in unicode sequences.
   {
     std::string out;
