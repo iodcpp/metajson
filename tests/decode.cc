@@ -53,5 +53,18 @@ int main()
     assert(obj.test2 == "John");
   }
   
-  
+  {
+    // plain vectors.
+    std::string input = R"json([1,2,3,4])json";
+    
+    std::vector<int> v;
+    auto err = iod::json_decode(input, v);
+    assert(!err);
+    assert(v.size() == 4);
+    assert(v[0] == 1);
+    assert(v[1] == 2);
+    assert(v[2] == 3);
+    assert(v[3] == 4);
+  }
+
 }

@@ -9,7 +9,12 @@ namespace iod
 {
 
   template <typename T>
+  struct json_object_base;
+  
+  template <typename T>
   struct json_object_;
+  template <typename T>
+  struct json_vector_;
   struct json_key;
   
   namespace impl
@@ -22,10 +27,8 @@ namespace iod
     template <typename S, typename T>
     auto make_json_object_member(const assign_exp<S, T>& e)
     {
-
       return cat(make_json_object_member(e.left),
                  make_metamap(_type = e.right));
-
     }
 
     template <typename S>
@@ -36,16 +39,35 @@ namespace iod
 
 
     template <typename M>
-    auto metamap_to_json_object(M m)
+    auto to_json_schema(M m)
+    {
+      return m;
+    }
+
+    template <typename... M>
+    auto to_json_schema(const metamap<M...>& m);
+    
+    template <typename V>
+    auto to_json_schema(const std::vector<V>& arr)
+    {
+      auto elt = to_json_schema(decltype(arr[0]){});
+      return json_vector_<decltype(elt)>{elt};
+    }
+
+    template <typename... M>
+    auto to_json_schema(const metamap<M...>& m)
     {
       auto tuple_maker = [] (auto&&... t) { return std::make_tuple(std::forward<decltype(t)>(t)...); };
 
       auto entities = map_reduce(m, [] (auto k, auto v) {
-          return make_metamap(_name = k, _type = v);
+          return make_metamap(_name = k, _type = to_json_schema(v));
         }, tuple_maker);
-      return json_object_<decltype(entities)>{entities};
+
+
+      return json_object_<decltype(entities)>(entities);
     }
 
+    
     template <typename... E>
     auto json_object_to_metamap(const json_object_<std::tuple<E...>>& s)
     {

@@ -44,7 +44,12 @@ namespace iod
       ss << '[';
       for (const auto& t : array)
       {
-        json_encode(ss, t, schema.object);
+        if constexpr(decltype(json_is_vector(E{})){} or decltype(json_is_object(E{})){}) {
+            json_encode(ss, t, schema.schema);
+          }
+        else
+          json_encode_value(ss, t);
+          
         if (&t != &array.back())
           ss << ',';
       }
@@ -79,7 +84,7 @@ namespace iod
             json_encode_value(ss, symbol_member_access(obj, e.name));
         };
 
-      tuple_apply_each(encode_one_entity, schema.members);
+      tuple_apply_each(encode_one_entity, schema.schema);
       ss << '}';
     }
   }

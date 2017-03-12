@@ -1,5 +1,4 @@
 #include <cassert>
-#include <iostream>
 #include <iod/metajson/metajson.hh>
 namespace s
 {
@@ -50,5 +49,20 @@ int main()
   
     assert(input == iod::json_object(s::_test1, s::_test2(iod::json_key("name"))).encode(obj));
   }
-  
+
+  {
+    // Nested array
+    std::string input = R"json([{"test1":["test1":12]}])json";
+
+    using s::_test1;
+    typedef decltype(iod::make_metamap(_test1 = std::vector<decltype(iod::make_metamap(_test1 = int()))>())) elt;
+    auto obj = std::vector<elt>();
+    obj.push_back(iod::make_metamap(_test1 = { iod::make_metamap(_test1 = 12) }));
+  }
+
+  {
+    // plain vectors.
+    std::string input = R"json([1,2,3,4])json";
+    assert(iod::json_encode(std::vector<int>{1,2,3,4}) == input);
+  }
 }

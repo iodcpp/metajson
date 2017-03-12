@@ -13,28 +13,33 @@ namespace iod
   struct metamap;
   
   template <typename T>
-  struct json_object_
+  struct json_object_base
   {
 
   public:
 
+    inline auto downcast() const
+    {
+      return static_cast<const T*>(this);
+    }
+
     template <typename C, typename O>
     void encode(C& output, O&& obj) const
     {
-      return impl::json_encode(output, std::forward<O>(obj), *this);
+      return impl::json_encode(output, std::forward<O>(obj), *downcast());
     }
 
     template <typename C, typename... M>
     void encode(C& output, const metamap<M...>& obj) const
     {
-      return impl::json_encode(output, obj, *this);
+      return impl::json_encode(output, obj, *downcast());
     }
       
     template <typename O>
     std::string encode(O obj) const
     {
       std::stringstream ss;
-      impl::json_encode(ss, std::forward<O>(obj), *this);
+      impl::json_encode(ss, std::forward<O>(obj), *downcast());
       return ss.str();
     }
 
@@ -42,38 +47,48 @@ namespace iod
     std::string encode(const metamap<M...>& obj) const
     {
       std::stringstream ss;
-      impl::json_encode(ss, obj, *this);
+      impl::json_encode(ss, obj, *downcast());
       return ss.str();
     }
       
     template <typename C, typename O>
-    void decode(C& input, O& obj) const
+    json_error decode(C& input, O& obj) const
     {
-      return impl::json_decode(input, obj, *this);
+      return impl::json_decode(input, obj, *downcast());
     }
 
     template <typename C, typename... M>
     auto decode(C& input) const
     {
-      auto map = impl::json_object_to_metamap(*this);
-      impl::json_decode(input, map, *this);
+      auto map = impl::json_object_to_metamap(*downcast());
+      impl::json_decode(input, map, *downcast());
       return map;
     }
 
-    T members;
   };
+
+  template <typename T>
+  struct json_object_ : public json_object_base<json_object_<T>>
+  {
+    json_object_() = default;
+    json_object_(const T& s) : schema(s) {}
+    T schema;
+  };
+    
   
   template <typename... S>
   auto json_object(S&&... s)
   {
     auto members = std::make_tuple(impl::make_json_object_member(std::forward<S>(s))...);
-    return json_object_<decltype(members)>{members};    
+    return json_object_<decltype(members)>{members};
   }
 
-  template <typename O>
-  struct json_vector_
+  template <typename T>
+  struct json_vector_ : public json_object_base<json_vector_<T>>
   {
-    O object;
+    json_vector_() = default;
+    json_vector_(const T& s) : schema(s) {}
+    T schema;
   };
     
   template <typename... S>
@@ -89,21 +104,22 @@ namespace iod
     const char* key;
   };
   
-  template <typename C, typename... M>
-  auto json_decode(C& input, metamap<M...>& map)
+  template <typename C, typename M>
+  auto json_decode(C& input, M& obj)
   {
-    impl::metamap_to_json_object(map).decode(input, map);
+    return impl::to_json_schema(obj).decode(input, obj);
   }
 
-  template <typename C, typename... M>
-  auto json_encode(C& output, metamap<M...>& map)
+  template <typename C, typename M>
+  auto json_encode(C& output, const M& obj)
   {
-    impl::metamap_to_json_object(map).encode(output, map);
+    impl::to_json_schema(obj).encode(output, obj);
   }
 
-  template <typename... M>
-  auto json_encode(metamap<M...>& map)
+  template <typename M>
+  auto json_encode(const M& obj)
   {
-    return impl::metamap_to_json_object(map).encode(map);
+    return impl::to_json_schema(obj).encode(obj);
   }
+
 }

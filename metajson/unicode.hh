@@ -5,6 +5,8 @@
 #include <iod/symbol/symbol.hh>
 #include <iod/metamap/metamap.hh>
 
+#include <iod/metajson/error.hh>
+
 namespace iod
 {
 
@@ -117,11 +119,6 @@ namespace iod
   // In addition to utf8, JSON escape characters ( " \ / ) with a backslash and translate
   // \n \r \t \b \r in their matching two characters string, for example '\n' to  '\' followed by 'n'.
 
-  struct json_error_ { int code; const char* what; };
-
-  json_error_ json_error(const char* what) { return {1, what}; }
-  json_error_ json_no_error() { return {0, ""}; }
-
   namespace unicode_impl
   {
     template <typename S, typename T>
@@ -129,7 +126,7 @@ namespace iod
     {
       // Convert a JSON string into an UTF-8 string.
       if (s.get() != '"')
-        return json_error("json_to_utf8: JSON strings should start with a double quote.");
+        return make_json_error("json_to_utf8: JSON strings should start with a double quote.");
       
       while (true)
       {
@@ -138,7 +135,7 @@ namespace iod
           o.append(s.get());
 
         // If eof found before the end of the string, return an error.
-        if (s.eof()) return json_error("json_to_utf8: Unexpected end of string when parsing a string.");
+        if (s.eof()) return make_json_error("json_to_utf8: Unexpected end of string when parsing a string.");
 
         // If end of json string, return
         if (s.peek() == '"')
@@ -155,7 +152,7 @@ namespace iod
         {
           // List of escaped char from http://www.json.org/ 
         default:
-          return json_error("json_to_utf8: Bad JSON escaped character.");
+          return make_json_error("json_to_utf8: Bad JSON escaped character.");
         case '"': o.append('"'); break;
         case '\\': o.append('\\'); break;
         case '/': o.append('/'); break;
@@ -173,7 +170,7 @@ namespace iod
           d = s.get();
 
           if (s.eof())
-            return json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
+            return make_json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
 
           auto decode_hex_c = [] (char c) {
             if (c >= '0' and c <= '9') return c - '0';
@@ -190,7 +187,7 @@ namespace iod
           if (x >= 0xD800 and x <= 0xDBFF)
           {
             if (s.get() != '\\' or s.get() != 'u')
-              return json_error("json_to_utf8: Missing low surrogate.");
+              return make_json_error("json_to_utf8: Missing low surrogate.");
           
             uint16_t y =
               (decode_hex_c(s.get()) << 12) +
@@ -199,7 +196,7 @@ namespace iod
               decode_hex_c(s.get());
 
             if (s.eof())
-              return json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
+              return make_json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
 
             x -= 0xD800;
             y -= 0xDC00;
@@ -231,14 +228,14 @@ namespace iod
               o.append(0b10000000 | (x & 0x003F));
             }
             else
-              return json_error("json_to_utf8: Bad UTF8 codepoint.");            
+              return make_json_error("json_to_utf8: Bad UTF8 codepoint.");            
           }
           break;
         }
       }
 
       if (s.get() != '"')
-        return json_error("JSON strings must end with a double quote.");
+        return make_json_error("JSON strings must end with a double quote.");
     
       return json_no_error();
     }
@@ -295,7 +292,7 @@ namespace iod
             if (cp >= 0x0080 and cp <= 0x07FF)
               encode_16bits(cp);
             else
-              return json_error("utf8_to_json: Bad UTF8 codepoint.");
+              return make_json_error("utf8_to_json: Bad UTF8 codepoint.");
           }
           else if (c1 < 0b11110000) // 16 bits - 3 char: 1110xxxx	10xxxxxx	10xxxxxx
           {
@@ -306,7 +303,7 @@ namespace iod
             if (cp >= 0x0800 and cp <= 0xFFFF)
               encode_16bits(cp);
             else
-              return json_error("utf8_to_json: Bad UTF8 codepoint.");          
+              return make_json_error("utf8_to_json: Bad UTF8 codepoint.");          
           }
           else // 21 bits - 4 chars: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
           {
