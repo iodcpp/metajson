@@ -31,6 +31,8 @@ namespace iod
   inline decltype(auto)
   wrap_json_input_stream(std::stringstream& s) { return s; }
   inline decltype(auto)
+  wrap_json_input_stream(iod::decode_stringstream& s) { return s; }
+  inline decltype(auto)
   wrap_json_input_stream(const std::string& s) { return std::stringstream(s); }
   inline decltype(auto)
   wrap_json_input_stream(const char* s) { return std::stringstream(std::string(s)); }
