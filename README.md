@@ -24,7 +24,7 @@ others UTF-{32|16} {big|little} endian encodings.
 Overview
 ============================
 
-[iod::metamaps](https://github.com/iodcpp/metamap) are the easiest type to serialize:
+[iod::metamap](https://github.com/iodcpp/metamap) is the easiest type to serialize:
 
 ```c++
 IOD_SYMBOL(_name)
