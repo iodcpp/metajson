@@ -23,7 +23,7 @@ namespace iod
       if (end)
         *end = str;
     }
-
+    
     template <typename I>
     void parse_int(I* val, const char* str, const char** end)
     {
@@ -51,29 +51,29 @@ namespace iod
   public:
 
     decode_stringstream(string_view buffer_)
-      : pos(0),
+      : cur(buffer_.data()),
         bad_(false),
         buffer(buffer_) {}
     
-    bool eof() const { return pos >= buffer.size(); }
-    auto& peek() const { return buffer[pos]; }
-    int get()        { return buffer[pos++]; }
-    int bad() const  { return bad_; }
+    inline bool eof() const { return cur >= &buffer.back(); }
+    inline auto& peek() const { return *cur; }
+    inline int get()        { return *(cur++); }
+    inline int bad() const  { return bad_; }
 
     template <typename T>
     void operator>>(T& value)
       {
+        eat_spaces();
         if constexpr(std::is_floating_point<T>::value) {
             // Decode floating point.
           }
         else if constexpr (std::is_integral<T>::value) {
             // Decode integer.
-            eat_spaces();
             const char* end = nullptr;
-            internal::parse_int(&value, buffer.data() + pos, &end);
-            if (end == (buffer.data() + pos))
+            internal::parse_int(&value, cur, &end);
+            if (end == cur)
               bad_ = true;
-            pos = end - buffer.data();
+            cur = end;
           }
         else if constexpr (std::is_same<T, std::string>::value) {
             // Decode UTF8 string.
@@ -88,11 +88,12 @@ namespace iod
 
     inline void eat_spaces()
       {
-        while (peek() >= 0 and peek() < 33) pos++;
+        while (peek() < 33) ++cur;
       }
     
     int bad_;
-    int pos;
+    const char* cur;
     string_view buffer; //
   };
+
 }

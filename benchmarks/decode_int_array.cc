@@ -8,7 +8,7 @@
 #include "nlohmann_json.hpp"
 
 //const char* json_str = "{\"test1\":12,\"test2\":12}";
-const char* json_str = R"json({"test1":12,"test2":1223})json";
+const char* json_str = R"json([0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9   ])json";
 
 // static void stringstream(benchmark::State& state) {
 
@@ -33,14 +33,16 @@ static void iod_custom_stream(benchmark::State& state) {
 
   long i = 0;
   //std::stringstream ss = std::stringstream(std::string(json_str));
-  auto obj = make_metamap(s::_test1 = 0, s::_test2 = 0);
+  auto obj = std::vector<int>();
   while (state.KeepRunning())
   {
+    obj.clear();
     decode_stringstream ss(json_str);
     //std::stringstream ss = std::stringstream(std::string(json_str));
     auto err = iod::json_decode(ss, obj);
-    //std::cout << err.what << std::endl;
+    //std::cout << err.code << std::endl;
   }
+  // std::cout << obj.size() << std::endl;
 }
 
 
@@ -48,14 +50,18 @@ static void bench_rapidjson(benchmark::State& state) {
 
   long i = 0;
   //std::stringstream ss = std::stringstream(std::string(json_str));
-  auto obj = make_metamap(s::_test1 = 0, s::_test2 = 0);
+  auto obj = std::vector<int>();
   while (state.KeepRunning())
   {
+    obj.clear();
     rapidjson::Document d;
     d.Parse<0>(json_str);
-    obj.test1 = d["test1"].GetInt();
-    obj.test2 = d["test2"].GetInt();
+    for (auto& x : d.GetArray())
+      obj.push_back(int(x.GetInt()));
+    // obj.test1 = d["test1"].GetInt();
+    // obj.test2 = d["test2"].GetInt();
   }
+  // std::cout << obj.size() << std::endl;
 }
 
 
@@ -63,20 +69,24 @@ static void bench_nlohmann_json(benchmark::State& state) {
 
   long i = 0;
   //std::stringstream ss = std::stringstream(std::string(json_str));
-  auto obj = make_metamap(s::_test1 = 0, s::_test2 = 0);
+  auto obj = std::vector<int>();
   while (state.KeepRunning())
   {
+    obj.clear();
     auto d = nlohmann::json::parse(json_str);
-    obj.test1 = d["test1"];
-    obj.test2 = d["test2"];
+    for (auto& x : d)
+      obj.push_back(int(x));
+    // obj.test1 = d["test1"];
+    // obj.test2 = d["test2"];
   }
+  // std::cout << obj.size() << std::endl;
 }
 
 static void iod_stringstream(benchmark::State& state) {
 
   long i = 0;
   //std::stringstream ss = std::stringstream(std::string(json_str));
-  auto obj = make_metamap(s::_test1 = 0, s::_test2 = 0);
+  auto obj = std::vector<int>();
   while (state.KeepRunning())
   {
     //decode_stringstream ss(json_str);

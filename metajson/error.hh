@@ -18,6 +18,8 @@ namespace iod
 
   json_error make_json_error(const char* what) { return {1}; }
   json_error json_no_error() { return {0}; }
+
+  static json_error json_ok = json_no_error();
   
   template <typename... W>
   auto make_json_error(W... what)
