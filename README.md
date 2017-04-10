@@ -3,16 +3,12 @@ iod::metajson
 
 
 iod::metajson is provides a fast and easy to use JSON
-serializer/deserializer. The goal is to get as fast as a non-generic
-specialized hand-written serializer, for example:
+serializer/deserializer. The goal is to achieve the performance of non-generic
+specialized hand-written C alternatives.
 
-```c++
-printf("{\"name\":\"%s\",\"age\":%i}", a.name, a.age);
-```
-
-While being easier and safer to use. The big difference of iod::metajson over
-other serialization libraries is that it does not rely on a dynamic hashtable
-to store the objects, but on plain static C++ objects.
+The big difference of iod::metajson over  other serialization libraries is that
+it does not rely on a dynamic hashtable to store the objects, but on plain
+static C++ objects. This makes it is safer and faster.
 
 **Limitation:** metajson only handles JSON objects with a **static
   structure known at compile time**.
