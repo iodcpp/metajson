@@ -68,7 +68,7 @@ json_vector(_age, _name).decode(input, obj);
 And nested structures too:
 ```c++
 std::vector<A> array;
-json_object(_age, _name, _parents = json_array(_age, _name)).decode(input, obj);
+json_object(_age, _name, _parents = json_vector(_age, _name)).decode(input, obj);
 ```
 
 
