@@ -7,6 +7,7 @@
 #include <iod/metajson/utils.hh>
 #include <iod/metajson/unicode.hh>
 #include <iod/metajson/error.hh>
+#include <iod/metajson/decode_stringstream.hh>
 
 namespace iod
 {

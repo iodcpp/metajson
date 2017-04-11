@@ -73,8 +73,8 @@ std::string json_to_utf8(std::string s)
   // c should convert to "c"
   //auto err = iod::json_to_utf8(stream, out);
   auto err = iod::json_to_utf8(stream, out);
-  if (err.code)
-    std::cerr << err.what << std::endl;
+  // if (err.code)
+  //   std::cerr << err.what << std::endl;
   assert(err.code == 0);
   return out;
 }
@@ -88,8 +88,8 @@ std::string utf8_to_json(std::string s)
 
   // c should convert to "c"
   auto err = iod::utf8_to_json(stream, out);
-  if (err.code)
-    std::cerr << err.what << std::endl;
+  // if (err.code)
+  //   std::cerr << err.what << std::endl;
   assert(err.code == 0);
   return out;
 }

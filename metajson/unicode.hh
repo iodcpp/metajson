@@ -4,6 +4,7 @@
 #include <experimental/string_view>
 #include <iod/symbol/symbol.hh>
 #include <iod/metamap/metamap.hh>
+#include <iod/metajson/decode_stringstream.hh>
 
 #include <iod/metajson/error.hh>
 
