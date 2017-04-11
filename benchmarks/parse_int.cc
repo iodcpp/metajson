@@ -20,7 +20,7 @@ static void parse_uint(benchmark::State& state) {
   long i = 0;
   while (state.KeepRunning())
   {
-    iod::internal::parse_int(&i, uint_str, nullptr);
+    iod::internal::parse_uint(&i, uint_str, nullptr);
   }
 
   std::cout << i << std::endl;

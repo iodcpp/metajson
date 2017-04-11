@@ -40,7 +40,7 @@ namespace iod
         char g = ss.get();
         if (g != c)
           return make_json_error("Unexpected char. Got '", char(g), "' expected ", c);
-        return json_no_error();
+        return json_ok;
       }
 
       inline void eat_spaces()
@@ -99,7 +99,7 @@ namespace iod
             ss >> t;
             if (ss.bad())
               return make_json_error("Ill-formated value.");
-            return json_no_error();
+            return json_ok;
           }
         else
           // The JSON decoder only parses floating-point, integral and string types.
@@ -111,7 +111,7 @@ namespace iod
       // {
       //   eat_spaces();
       //   return json_to_utf8(ss, str);
-      //   //return json_no_error();
+      //   //return json_ok;
       // }
       
       S& ss;
@@ -123,7 +123,7 @@ namespace iod
       auto err = p.fill(obj);
       if (err) return err;
       else
-        return json_no_error();
+        return json_ok;
     }
     
     template <typename P, typename O, typename S>
@@ -144,11 +144,12 @@ namespace iod
 
         obj.resize(obj.size() + 1);
         if ((err = json_decode2(p, obj.back(), obj.back()))) return err;
+        p.eat_spaces();
       }
       
       if ((err = p.eat(']'))) return err;
       else
-        return json_no_error();
+        return json_ok;
     }
     
     template <typename P, typename O, typename S>
@@ -172,7 +173,7 @@ namespace iod
         
         A[i].parse_value = [m,&obj] (P& p) {
           if (auto err = p.fill(symbol_member_access(obj, m.name))) return err;
-          else return json_no_error();
+          else return json_ok;
         };
 
         i++;
@@ -181,7 +182,6 @@ namespace iod
       std::experimental::apply([&] (auto... m) { apply_each(prepare, m...); },
                                schema.schema);
 
-      int member_nth = 0;
       while (p.peek() != '}')
       {
         // std::string attr_name;
@@ -224,7 +224,6 @@ namespace iod
         //   }
         // }
 
-
         bool found = false;
         if ((err = p.eat('"'))) return err;
         char symbol[50];
@@ -234,9 +233,8 @@ namespace iod
         symbol[symbol_size] = 0;
         if ((err = p.eat('"', false))) return err;
   
-        for (int i_ = 0; i_ < n_members; i_++)
+        for (int i = 0; i < n_members; i++)
         {
-          int i = (i_ + member_nth) % n_members;
           int len = A[i].name_len;
           if (!strncmp(symbol, A[i].name, len))
           {
@@ -254,8 +252,7 @@ namespace iod
         if (!found)
           //return make_json_error("Unexpected json key: ", attr_name);
           return make_json_error("Unknown json key");
-        else
-          member_nth++;
+        p.eat_spaces();
         if (p.peek() == ',')
         {
           if ((err = p.eat(','))) return err;
@@ -263,7 +260,7 @@ namespace iod
       }
       if ((err = p.eat('}'))) return err;
 
-      return json_no_error();
+      return json_ok;
     }
 
     template <typename C, typename O, typename S>
