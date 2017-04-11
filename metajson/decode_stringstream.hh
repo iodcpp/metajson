@@ -2,6 +2,7 @@
 
 #include <experimental/string_view>
 #include <cmath>
+
 namespace iod
 {
   using std::experimental::string_view;
@@ -25,11 +26,7 @@ namespace iod
       if (end)
         *end = str;
     }
-<<<<<<< HEAD
-   
-=======
-    
->>>>>>> e706f7a1659c922003240ae599fed790a7d907f5
+
     template <typename I>
     void parse_int(I* val, const char* str, const char** end)
     {
@@ -149,10 +146,10 @@ namespace iod
             // Decode floating point.
             eat_spaces();
             const char* end = nullptr;
-            internal::parse_float(&value, buffer.data() + pos, &end);
-            if (end == (buffer.data() + pos))
+            internal::parse_float(&value, cur, &end);
+            if (end == cur)
               bad_ = true;
-            pos = end - buffer.data();
+            cur = end;
           }
         else if constexpr (std::is_integral<T>::value) {
             // Decode integer.
@@ -168,20 +165,34 @@ namespace iod
           }
         else if constexpr (std::is_same<T, string_view>::value) {
             // Decoding to stringview does not decode utf8.
-            const char* start = buffer.data() + pos;
+
+            if (get() != '"')
+            {
+              bad_ = true;
+              return;
+            }
+
+            const char* start = cur;
             bool escaped = false;
-            while (peek() != '\0' and (escaped or peek() != '\"'))
+            
+            while (peek() != '\0' and (escaped or peek() != '"'))
             {
               int nb = 0;
               while (peek() == '\\')
                 nb++;
 
               escaped = nb % 2;
-              pos++;
+              cur++;
             }
+            const char* end = cur;
+            value = string_view(start, end - start);
 
-            const char* end = buffer.data() + pos;
-            value = string_view(start, end);
+            if (get() != '"')
+            {
+              bad_ = true;
+              return;
+            }
+            
           }
       }
 

@@ -56,46 +56,9 @@ namespace iod
       json_error fill(T& t) {
 
         if constexpr(std::is_floating_point<T>::value or
-                     std::is_integral<T>::value) {
-            // Activate when std::from_chars gets available.
-            // eat_spaces();
-            // char buffer[40];
-            // int size = 0;
-            // bool end = false
-            // while (!end)
-            //   switch(ss.peek())
-            //   {
-            //   case '0':
-            //   case '1':
-            //   case '2':
-            //   case '3':
-            //   case '4':
-            //   case '5':
-            //   case '6':
-            //   case '7':
-            //   case '8':
-            //   case '9':
-            //   case '+':
-            //   case '-':
-            //   case 'E':
-            //   case 'e':
-            //   case '.':
-            //   size++; break;
-            //   default: end = true; break;
-            //   }
-            // // To benchmark with:
-            // // while ((ss.peek() >= '0' and ss.peek() <= '9') or
-            // //        ss.peek() == '+' or
-            // //        ss.peek() == '-' or
-            // //        ss.peek() == 'e' or
-            // //        ss.peek() == 'E' or
-            // //        ss.peek() == '.')
-            // //   size++;
-
-            // auto error = std::experimental::from_chars(buffer, buffer + size, t);
-            // if (error.ec == std::errc::invalid_argument)
-            //   return make_json_error("Invalid integer value: ", string_view(buffer, buffer + size));
-
+                     std::is_integral<T>::value or
+                     std::is_same<T, iod::string_view>::value
+          ) {
             ss >> t;
             if (ss.bad())
               return make_json_error("Ill-formated value.");
@@ -107,12 +70,13 @@ namespace iod
       }
 
       // Strings
-      // inline json_error fill(std::string& str)
-      // {
-      //   eat_spaces();
-      //   return json_to_utf8(ss, str);
-      //   //return json_ok;
-      // }
+      inline json_error fill(std::string& str)
+      {
+        eat_spaces();
+        str.clear();
+        return json_to_utf8(ss, str);
+        //return json_ok;
+      }
       
       S& ss;
     };
