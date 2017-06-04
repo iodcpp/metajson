@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(metajson)
 
-add_definitions(-std=c++1z -O3 -DNDEBUG -fopenmp=libomp -march=native)
+add_definitions(-std=c++1z -O3 -DNDEBUG -march=native)
 include_directories($ENV{HOME}/local/include ${CMAKE_BINARY_DIR}/include)
 link_directories($ENV{HOME}/local/lib)
 

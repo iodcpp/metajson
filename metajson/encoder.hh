@@ -21,8 +21,6 @@ namespace iod
     // Json encoder.
     // =============================================
 
-    // Fixme escape strings.
-
     template <typename T, typename C>
     inline void json_encode_value(C& ss, const T& t) { ss << t; }
 
