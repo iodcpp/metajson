@@ -8,7 +8,7 @@
 #include "nlohmann_json.hpp"
 
 //const char* json_str = "{\"test1\":12,\"test2\":12}";
-const char* json_str = R"json([0.02e-3,1.02e3,2.02e3,3.02e3,4.02e3,5.02e3,6.02e3,7.02e3,8.02e3,9.02e3,0.02e3,1.02e3,2.02e3,3.02e3,4.02e3,5.02e3,6.02e3,7.02e3,8.02e3,9.02e3,0.02e3,1.02e3,2.02e3,3.02e3,4.02e3,5.02e3,6.02e3,7.02e3,8.02e3,9.02e3,0.02e3,1.02e3,2.02e3,3.02e3,4.02e3,5.02e3,6.02e3,7.02e3,8.02e3,9.02e3,0.02e3,1.02e3,2.02e3,3.02e3,4.02e3,5.02e3,6.02e3,7.02e3,8.02e3,9.02e3,0.02e3,1.02e3,2.02e3,3.02e3,4.02e3,5.02e3,6.02e3,7.02e3,8.02e3,9.3949   ])json";
+const char* json_str = R"json([0.02e-3,1.024654e3,2.0246782e3,3.789402e3,4.02462e3,5.02e3,6.02e3,7.02e3,8.02e3,9.02e3,0.02e3,1.02e3,2.02e3,3.02e3,4.02e3,5.02e3,6.02e3,7.02e3,8.02e3,9.456202e3,0.02e3,1.078942e3,2.02e3,3.02e3,4.02e3,5.02e3,6.02e3,7.02e3,8.02e3,9.02e3,0.02e3,1.02e3,2.02e3,  3.02e3  ,   4.02e3,5.02e3,6.02e3,7.0456782e3,8.02e3,9.02e3,0.02e3,1.02e3,2.02e3,3.02e3,4.057952e3,5.02e3,6.0779852e3,7.02e3,8.048972e3,9.048492e3,0.02e3,1.02e3,2.02e3,3.02e3,4.02e3,5.02e3,6.02e3,7.02e3,8.02e3,9.3949   ])json";
 
 // static void stringstream(benchmark::State& state) {
 
@@ -32,15 +32,12 @@ namespace s
 static void iod_custom_stream(benchmark::State& state) {
 
   long i = 0;
-  //std::stringstream ss = std::stringstream(std::string(json_str));
   auto obj = std::vector<float>();
   while (state.KeepRunning())
   {
     obj.clear();
     decode_stringstream ss(json_str);
-    //std::stringstream ss = std::stringstream(std::string(json_str));
     auto err = iod::json_decode(ss, obj);
-    //std::cout << err.code << std::endl;
   }
   std::cout << obj.size() << std::endl;
   std::cout << obj[0] << std::endl;
@@ -50,7 +47,6 @@ static void iod_custom_stream(benchmark::State& state) {
 static void bench_rapidjson(benchmark::State& state) {
 
   long i = 0;
-  //std::stringstream ss = std::stringstream(std::string(json_str));
   auto obj = std::vector<float>();
   while (state.KeepRunning())
   {
@@ -58,18 +54,15 @@ static void bench_rapidjson(benchmark::State& state) {
     rapidjson::Document d;
     d.Parse<0>(json_str);
     for (auto& x : d.GetArray())
-      obj.push_back(int(x.GetFloat()));
-    // obj.test1 = d["test1"].GetInt();
-    // obj.test2 = d["test2"].GetInt();
+      obj.push_back(x.GetFloat());
   }
-  // std::cout << obj.size() << std::endl;
+  std::cout << obj.size() << std::endl;
 }
 
 
 static void bench_nlohmann_json(benchmark::State& state) {
 
   long i = 0;
-  //std::stringstream ss = std::stringstream(std::string(json_str));
   auto obj = std::vector<float>();
   while (state.KeepRunning())
   {
@@ -77,23 +70,18 @@ static void bench_nlohmann_json(benchmark::State& state) {
     auto d = nlohmann::json::parse(json_str);
     for (auto& x : d)
       obj.push_back(float(x));
-    // obj.test1 = d["test1"];
-    // obj.test2 = d["test2"];
   }
-  // std::cout << obj.size() << std::endl;
 }
 
 static void iod_stringstream(benchmark::State& state) {
 
   long i = 0;
-  //std::stringstream ss = std::stringstream(std::string(json_str));
   auto obj = std::vector<float>();
   while (state.KeepRunning())
   {
-    //decode_stringstream ss(json_str);
-    std::stringstream ss = std::stringstream(std::string(json_str));
+    obj.clear();
+    std::stringstream ss = std::stringstream(json_str);
     auto err = iod::json_decode(ss, obj);
-    //std::cout << err.what << std::endl;
   }
 }
 
