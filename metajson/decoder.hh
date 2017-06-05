@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <cstring>
 #include <utility>
 #include <experimental/string_view>
@@ -230,7 +231,8 @@ namespace iod
     template <typename C, typename O, typename S>
     json_error json_decode(C& input, O& obj, S schema)
     {
-      json_parser<C> p(input);
+      auto stream = decode_stringstream(input);
+      json_parser<decode_stringstream> p(stream);
       return json_decode2(p, obj, schema);
     }
     

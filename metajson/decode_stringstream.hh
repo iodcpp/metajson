@@ -128,7 +128,7 @@ namespace iod
   {
   public:
 
-    decode_stringstream(string_view buffer_)
+    inline decode_stringstream(string_view buffer_)
       : cur(buffer_.data()),
         bad_(false),
         buffer(buffer_) {}

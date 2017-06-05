@@ -46,6 +46,8 @@ if __name__ == "__main__":
 
     # git clone recursive iod
     subprocess.check_call(["git", "clone", "--recursive", "https://github.com/iodcpp/iod", src_dir])
+    # subprocess.check_call(["git", "clone", "/home/matt/iod", src_dir])
+    # subprocess.check_call(["cp", "-R", "/home/matt/iod", src_dir])
 
     # cd build_dir
     os.chdir(build_dir)

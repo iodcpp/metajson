@@ -20,6 +20,8 @@ int main()
     assert(obj.test2 == "John");
   }
 
+  #if 0
+
   { // Double quote escape.
     std::string input = R"json({"test1":12,"test2":"John\""})json";
 
@@ -67,4 +69,5 @@ int main()
     assert(v[3] == 4);
   }
 
+  #endif
 }
