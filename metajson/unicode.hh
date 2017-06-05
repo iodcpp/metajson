@@ -4,6 +4,7 @@
 #include <experimental/string_view>
 #include <iod/symbol/symbol.hh>
 #include <iod/metamap/metamap.hh>
+#include <iod/metajson/decode_stringstream.hh>
 
 #include <iod/metajson/error.hh>
 
@@ -30,6 +31,8 @@ namespace iod
 
   inline decltype(auto)
   wrap_json_input_stream(std::stringstream& s) { return s; }
+  inline decltype(auto)
+  wrap_json_input_stream(iod::decode_stringstream& s) { return s; }
   inline decltype(auto)
   wrap_json_input_stream(const std::string& s) { return std::stringstream(s); }
   inline decltype(auto)
