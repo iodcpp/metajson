@@ -20,10 +20,13 @@ hashtables to store objects, but on plain static C++ objects.
 **Performances:** Up to **9x** faster than nlohmann/json and **2x** faster than rapidjson [2].
 
 [1] https://github.com/nlohmann/json
+
 [2] https://github.com/miloyip/rapidjson
 
 Installation
 ============================
+
+
 
 Overview
 ============================
