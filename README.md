@@ -83,9 +83,21 @@ int main ()
   // {"id":1,"entry":{"age":12,"name":"John"}}
 
 
-  // Metamaps
 
-  iod::json_encode(iod::metamap)
+  // Metamap
+  using iod::make_metamap;
+  auto map = make_metamap(s::_age = 12, s::_name = std::string("John"));
+  json_str = json_encode(map);
+  
+  std::cout << json_str << std::endl;
+  // {"age":12,"name":"John"}
+  
+  json_decode(json_str, map);
+
+
+  // Custom JSON key.
+  std::cout << json_object(s::_age, s::_name(iod::json_key("last_name"))).encode(obj) << std::endl;
+  // {"age":12,"last_name":"John"}
 
 }
 
@@ -97,8 +109,3 @@ specify it with the json_key attribute in the description of your object:
 ```c++
 json_object(_age, _name(json_key("last_name")))
 ```
-
-Roadmap
-=================
-
-- Replace std::stringstream with a faster alternative
