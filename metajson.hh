@@ -7,16 +7,16 @@
 
 #pragma once
 
-#include <sstream>
 #include <utility>
-#include <cstring>
-#include <cmath>
-#include <functional>
 #include <vector>
+#include <cassert>
+#include <cstring>
 #include <string>
 #include <experimental/string_view>
 #include <experimental/tuple>
-#include <cassert>
+#include <cmath>
+#include <sstream>
+#include <functional>
 
 
 
@@ -871,7 +871,13 @@ namespace iod
 
 namespace iod
 {
-  
+
+  // enum JSON_ERROR
+  // {
+  //   JSON_OK = 0
+  //   //JSON_
+  // }
+    
   struct json_error
   {
     json_error& operator=(const json_error&) = default;
