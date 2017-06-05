@@ -40,7 +40,7 @@ Installation
 wget https://raw.githubusercontent.com/iodcpp/metajson/master/metajson.hh
 ```
 
-```
+```c++
 #include "metajson.hh"
 ```
 
