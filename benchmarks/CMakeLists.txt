@@ -22,3 +22,6 @@ target_link_libraries(decode_int_array benchmark pthread)
 add_executable(decode_float_array decode_float_array.cc)
 target_link_libraries(decode_float_array benchmark pthread)
 
+add_executable(decode_float_array_iod decode_float_array_iod.cc)
+add_executable(decode_float_array_rapidjson decode_float_array_rapidjson.cc)
+add_executable(decode_float_array_nlo decode_float_array_nlo.cc)

@@ -5,11 +5,11 @@
 namespace iod
 {
 
-  enum JSON_ERROR
-  {
-    JSON_OK = 0
-    //JSON_
-  }
+  // enum JSON_ERROR
+  // {
+  //   JSON_OK = 0
+  //   //JSON_
+  // }
     
   struct json_error
   {
