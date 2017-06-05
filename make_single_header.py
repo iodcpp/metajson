@@ -11,6 +11,7 @@ def process_file(f, processed, output):
     if f in processed:
         return
     processed.append(f)
+
     for line in open(f, "r"):
         m = re.match("^#include\s*<(iod/.*)>.*$", line)
         if m:
@@ -21,6 +22,7 @@ def process_file(f, processed, output):
             m2 = re.match("namespace\s*iod(\s*)", line)
             output.append("namespace metajson" + m2.group(1))
         else:
+            line = re.sub(r"iod::", "metajson::", line)
             output.append(line)
 
 if __name__ == "__main__":
@@ -32,7 +34,7 @@ if __name__ == "__main__":
 
     output_file=open(sys.argv[1], 'w')
 
-        # create temp directory.
+    # create temp directory.
     tmp_dir=tempfile.mkdtemp()
     src_dir=join(tmp_dir, "src")
     build_dir=join(tmp_dir, "build")
@@ -46,14 +48,12 @@ if __name__ == "__main__":
 
     # git clone recursive iod
     subprocess.check_call(["git", "clone", "--recursive", "https://github.com/iodcpp/iod", src_dir])
-    # subprocess.check_call(["git", "clone", "/home/matt/iod", src_dir])
-    # subprocess.check_call(["cp", "-R", "/home/matt/iod", src_dir])
 
     # cd build_dir
     os.chdir(build_dir)
 
     # Install
-    subprocess.check_call(["cmake", src_dir, "-DCMAKE_INSTALL_PREFIX=" + install_dir, "-DCMAKE_CXX_COMPILER=clang++"])
+    subprocess.check_call(["cmake", src_dir, "-DCMAKE_INSTALL_PREFIX=" + install_dir, "-DCMAKE_CXX_COMPILER=g++"])
     subprocess.check_call(["make", "install", "-j4"])
 
     # Generate single file header.
@@ -81,5 +81,6 @@ if __name__ == "__main__":
     output_file.close()
     
     print("metajson single header", sys.argv[1], "generated.")
+
     # Cleanup
     shutil.rmtree(tmp_dir)
