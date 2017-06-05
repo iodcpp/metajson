@@ -18,11 +18,7 @@ def process_file(f, processed, output):
             process_file(join(install_dir, "include", m.group(1)), processed, output)
         elif re.match("#pragma once", line):
             pass
-        elif re.match("namespace\s*iod(\s*)", line):
-            m2 = re.match("namespace\s*iod(\s*)", line)
-            output.append("namespace metajson" + m2.group(1))
         else:
-            line = re.sub(r"iod::", "metajson::", line)
             output.append(line)
 
 if __name__ == "__main__":
@@ -69,11 +65,13 @@ if __name__ == "__main__":
         else:
             body.append(line)
 
-    output_file.write("// Single header version of iod::metajson [1].\n")
-    output_file.write("// This file is generated, do not edit it directly.\n")
-    output_file.write("// [1] https://github.com/iodcpp/metajson\n\n")
+    output_file.write("// Author: Matthieu Garrigues matthieu.garrigues@gmail.com\n//\n")
+    output_file.write("// Single header version the iod/metajson library.\n")
+    output_file.write("// https://github.com/iodcpp/metajson\n")
+    output_file.write("//\n")    
+    output_file.write("// Note: This file is generated.\n\n")
     output_file.write("#pragma once\n\n")
-    for l in includes:
+    for l in set(includes):
         output_file.write(l)
     output_file.write("\n\n")
     for l in body:

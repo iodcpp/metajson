@@ -39,8 +39,6 @@ static void iod_custom_stream(benchmark::State& state) {
     decode_stringstream ss(json_str);
     auto err = iod::json_decode(ss, obj);
   }
-  std::cout << obj.size() << std::endl;
-  std::cout << obj[0] << std::endl;
 }
 
 
@@ -56,7 +54,6 @@ static void bench_rapidjson(benchmark::State& state) {
     for (auto& x : d.GetArray())
       obj.push_back(x.GetFloat());
   }
-  std::cout << obj.size() << std::endl;
 }
 
 
@@ -73,21 +70,8 @@ static void bench_nlohmann_json(benchmark::State& state) {
   }
 }
 
-static void iod_stringstream(benchmark::State& state) {
-
-  long i = 0;
-  auto obj = std::vector<float>();
-  while (state.KeepRunning())
-  {
-    obj.clear();
-    std::stringstream ss = std::stringstream(json_str);
-    auto err = iod::json_decode(ss, obj);
-  }
-}
-
 BENCHMARK(iod_custom_stream);
 BENCHMARK(bench_rapidjson);
 BENCHMARK(bench_nlohmann_json);
-BENCHMARK(iod_stringstream);
 
 BENCHMARK_MAIN();

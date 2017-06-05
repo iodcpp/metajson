@@ -2,7 +2,7 @@
 #include "../metajson/decode_stringstream.hh"
 #include <benchmark/benchmark.h>
 
-const char* uint_str = "2000";
+const char* uint_str = "232084905";
 
 static void strtol(benchmark::State& state) {
 
@@ -12,7 +12,6 @@ static void strtol(benchmark::State& state) {
     i = std::strtol(uint_str, nullptr, 10);
   }
 
-  std::cout << i << std::endl;
 }
 
 static void parse_uint(benchmark::State& state) {
@@ -23,7 +22,6 @@ static void parse_uint(benchmark::State& state) {
     iod::internal::parse_uint(&i, uint_str, nullptr);
   }
 
-  std::cout << i << std::endl;
 }
 
 BENCHMARK(parse_uint);
