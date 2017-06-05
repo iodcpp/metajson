@@ -21,7 +21,8 @@ use.
   - iod::metajson properly handle decoding and encoding UTF-8 but not the others UTF-{32|16} {big|little} endian encodings.
   - No explicit errors for ill-formatted json messsages.
 
-**Performances:** Up to **9x** faster than nlohmann/json and **2x** faster than rapidjson [2].
+**Performances:** Up to **9x** faster than nlohmann/json and **2x** faster than rapidjson [2]. Please report
+if you find cases where metajson performs slower.
 
 [1] https://github.com/nlohmann/json
 
@@ -117,11 +118,4 @@ int main ()
 
 }
 
-```
-
-If the member of the object does not match a given JSON key, you can
-specify it with the json_key attribute in the description of your object:
-
-```c++
-json_object(_age, _name(json_key("last_name")))
 ```
