@@ -76,7 +76,6 @@ namespace iod
         eat_spaces();
         str.clear();
         return json_to_utf8(ss, str);
-        //return json_ok;
       }
       
       S& ss;
@@ -149,45 +148,6 @@ namespace iod
 
       while (p.peek() != '}')
       {
-        // std::string attr_name;
-        // if ((err = p.fill(attr_name))) return err;
-        // if ((err = p.eat(':'))) return err;
-
-        // bool found = false;
-        // for (int i = 0; i < n_members; i++)
-        // {
-        //   if (attr_name == A[i].name)
-        //   {
-        //     if (A[i].filled)
-        //       return make_json_error("Duplicate json key: ", attr_name);
-            
-        //     if ((err = A[i].parse_value(p))) return err;
-        //     A[i].filled = true;
-        //     found = true;
-        //     break;
-        //   }
-        // }
-
-        // bool found = false;
-        // if ((err = p.eat('"'))) return err;
-        // for (int i = 0; i < n_members; i++)
-        // {
-        //   int len = A[i].name_len;
-        //   if (!strncmp(&p.peek(), A[i].name, len))
-        //   {
-        //     for (int k = 0; k < len; k++)
-        //       p.skip_one();
-        //     if ((err = p.eat('"', false))) return err;
-        //     if ((err = p.eat(':'))) return err;
-        //     if (A[i].filled)
-        //       return make_json_error("Duplicate json key: ", A[i].name);
-            
-        //     if ((err = A[i].parse_value(p))) return err;
-        //     A[i].filled = true;
-        //     found = true;
-        //     break;
-        //   }
-        // }
 
         bool found = false;
         if ((err = p.eat('"'))) return err;
@@ -215,7 +175,6 @@ namespace iod
         }
         
         if (!found)
-          //return make_json_error("Unexpected json key: ", attr_name);
           return make_json_error("Unknown json key");
         p.eat_spaces();
         if (p.peek() == ',')
