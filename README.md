@@ -6,9 +6,12 @@ iod::metajson is a C++17 JSON serializer/deserializer, designed for
 ease of use and execution speed.
 
 Unlike others serialization libraries, it does not rely on dynamic
-hashtables to store objects, but on plain static C++ objects.
+hashtables to store objects, but on plain static C++ objects.  This
+makes it faster to compile, faster to execute, and easier to
+use.
 
 **Features:**
+  - Header only
   - UTF-8 support
   - Exception free
   - Small codebase: 1200 LOC (~10x smaller than nlohmann/json [1] and rapidjson [2])
@@ -16,6 +19,7 @@ hashtables to store objects, but on plain static C++ objects.
 **Limitations:**
   - metajson only handles JSON objects with a **static structure known at compile time**.
   - iod::metajson properly handle decoding and encoding UTF-8 but not the others UTF-{32|16} {big|little} endian encodings.
+  - No explicit errors for ill-formatted json messsages.
 
 **Performances:** Up to **9x** faster than nlohmann/json and **2x** faster than rapidjson [2].
 
@@ -23,10 +27,22 @@ hashtables to store objects, but on plain static C++ objects.
 
 [2] https://github.com/miloyip/rapidjson
 
+Author
+============================
+
+Matthieu Garrigues https://github.com/matt-42
+
+
 Installation
 ============================
 
+```
+wget https://raw.githubusercontent.com/iodcpp/metajson/master/metajson.hh
+```
 
+```
+#include "metajson.hh"
+```
 
 Overview
 ============================
