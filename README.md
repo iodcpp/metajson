@@ -22,10 +22,10 @@ use.
   - iod::metajson properly handle decoding and encoding UTF-8 but not the others UTF-{32|16} {big|little} endian encodings.
   - No explicit errors for ill-formatted json messsages.
 
-**Performances:** Up to **9x** faster than nlohmann/json and **2x** faster than rapidjson [2]. Please report
+**Performances:** Up to **9x** faster than nlohmann/json and **2x** faster than rapidjson. Please report
 if you find cases where metajson performs slower.
 
-**Code size:** Up to **8x** smaller than nlohmann/json and **2x** smaller than rapidjson [2].
+**Code size:** Up to **8x** smaller than nlohmann/json and **2x** smaller than rapidjson.
 
 [1] https://github.com/nlohmann/json
 
