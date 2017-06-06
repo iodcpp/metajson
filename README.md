@@ -22,14 +22,16 @@ lighter (w.r.t. binary code size) than the existing C++ JSON libraries.
   - No explicit errors for ill-formatted json messsages.
 
 **Performances:** Up to **9x** faster than nlohmann/json and **2x**
-  faster than rapidjson. I did not find usecases where metajson was
+  faster than rapidjson*. I did not find usecases where metajson was
   not the fastest. If you find some, please report.
 
-**Binary code size:** Up to **8x** smaller than nlohmann/json and **2x** smaller than rapidjson.
+**Binary code size:** Up to **8x** smaller than nlohmann/json and **2x** smaller than rapidjson*.
 
 [1] https://github.com/nlohmann/json
-
 [2] https://github.com/miloyip/rapidjson
+
+\* Theses numbers are not given by an comprehensive benchmark. They just give a rough idea
+of metajson performances.
 
 Author
 ============================
