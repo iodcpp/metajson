@@ -28,7 +28,9 @@ lighter (w.r.t. binary code size) than the existing C++ JSON libraries.
 **Binary code size:** Up to **8x** smaller than nlohmann/json and **2x** smaller than rapidjson*.
 
 [1] https://github.com/miloyip/rapidjson
+
 [2] https://github.com/nlohmann/json
+
 [3] https://github.com/AlDanial/cloc
 
 \* Theses numbers are not given by an comprehensive benchmark. They just give a rough idea
