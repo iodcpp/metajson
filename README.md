@@ -13,7 +13,7 @@ lighter (w.r.t. binary code size) than the existing C++ JSON libraries.
   - Header only
   - UTF-8 support
   - Exception free
-  - Small codebase: 1200 LOC (using David A. Wheeler's 'SLOCCount')
+  - Small codebase: 1200 LOC (8x smaller than rapidjson [1] and 5.5x smaller than nlohmann/json [2], counts from cloc[3], not including comments and spaces)
   - Portable: No architecture specific code.
 
 **Limitations:**
@@ -27,8 +27,9 @@ lighter (w.r.t. binary code size) than the existing C++ JSON libraries.
 
 **Binary code size:** Up to **8x** smaller than nlohmann/json and **2x** smaller than rapidjson*.
 
-[1] https://github.com/nlohmann/json
-[2] https://github.com/miloyip/rapidjson
+[1] https://github.com/miloyip/rapidjson
+[2] https://github.com/nlohmann/json
+[3] https://github.com/AlDanial/cloc
 
 \* Theses numbers are not given by an comprehensive benchmark. They just give a rough idea
 of metajson performances.
