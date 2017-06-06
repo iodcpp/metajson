@@ -13,7 +13,7 @@ lighter (w.r.t. binary code size) than the existing C++ JSON libraries.
   - Header only
   - UTF-8 support
   - Exception free
-  - Small codebase: 1200 LOC (8x smaller than rapidjson [1] and 5.5x smaller than nlohmann/json [2], counts from cloc[3], not including comments and spaces)
+  - Small codebase: 1200 LOC (8x smaller than rapidjson [1] and 5.5x smaller than nlohmann/json [2], counts from cloc [3], not including comments and spaces)
   - Portable: No architecture specific code.
 
 **Limitations:**
