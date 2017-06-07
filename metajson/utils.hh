@@ -15,6 +15,8 @@ namespace iod
   struct json_object_;
   template <typename T>
   struct json_vector_;
+  template <typename... T>
+  struct json_tuple_;
   struct json_key;
   
   namespace impl
@@ -52,6 +54,12 @@ namespace iod
     {
       auto elt = to_json_schema(decltype(arr[0]){});
       return json_vector_<decltype(elt)>{elt};
+    }
+
+    template <typename... V>
+    auto to_json_schema(const std::tuple<V...>& arr)
+    {
+      return json_tuple_<decltype(to_json_schema(V{}))...>(to_json_schema(V{})...);
     }
 
     template <typename... M>
@@ -108,7 +116,15 @@ namespace iod
   template <typename E> constexpr auto json_is_vector(json_vector_<E>) ->  std::true_type { return {}; }
   template <typename E> constexpr auto json_is_vector(E) ->  std::false_type { return {}; }
 
+  template <typename... E> constexpr auto json_is_tuple(json_tuple_<E...>) ->  std::true_type { return {}; }
+  template <typename E> constexpr auto json_is_tuple(E) ->  std::false_type { return {}; }
+  
   template <typename E> constexpr auto json_is_object(json_object_<E>) ->  std::true_type { return {}; }
   template <typename E> constexpr auto json_is_object(E) ->  std::false_type { return {}; }
+
+  template <typename E> constexpr auto json_is_value(json_object_<E>) ->  std::false_type { return {}; }
+  template <typename E> constexpr auto json_is_value(json_vector_<E>) ->  std::false_type { return {}; }
+  template <typename... E> constexpr auto json_is_value(json_tuple_<E...>) ->  std::false_type { return {}; }
+  template <typename E> constexpr auto json_is_value(E) ->  std::true_type { return {}; }
   
 }

@@ -116,6 +116,40 @@ namespace iod
         return json_ok;
     }
 
+    template <typename F, typename... E, typename... T, std::size_t... I>
+    inline void json_decode_tuple_elements(F& decode_fun,
+                                           std::tuple<T...>& tu,
+                                           const std::tuple<E...>& schema,
+                                           std::index_sequence<I...>)
+    {
+      (void)std::initializer_list<int>{
+        ((void)decode_fun(std::get<I>(tu), std::get<I>(schema)), 0)...};
+    }
+    
+    template <typename P, typename... O, typename... S>
+    json_error json_decode2(P& p, std::tuple<O...>& tu, json_tuple_<S...> schema)
+    {
+      bool first = true;
+      auto err = p.eat('[');
+      if (err) return err;
+
+      auto decode_one_element = [&first,&p,&err] (auto& value, auto value_schema) {
+        if (!first)
+        {
+          if ((err = p.eat(','))) return err;
+        }
+        first = false;
+        if ((err = json_decode2(p, value, value_schema))) return err;
+        p.eat_spaces();
+      };
+      
+      json_decode_tuple_elements(decode_one_element, tu, schema.elements, std::make_index_sequence<sizeof...(O)>{});
+
+      if ((err = p.eat(']'))) return err;
+      else
+        return json_ok;
+    }
+    
     
     template <typename P, typename O, typename S>
     json_error json_decode2(P& p, O& obj, json_object_<S> schema)

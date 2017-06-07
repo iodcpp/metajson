@@ -12,6 +12,8 @@ namespace iod
 {
   using std::experimental::string_view;
 
+  template <typename... T>
+  struct json_tuple_;
   template <typename T>
   struct json_object_;
   
@@ -54,6 +56,36 @@ namespace iod
       ss << ']';
     }
 
+    template <typename F, typename... E, typename... T, std::size_t... I>
+    inline void json_encode_tuple_elements(F& encode_fun,
+                                           const std::tuple<T...>& tu,
+                                           const std::tuple<E...>& schema,
+                                           std::index_sequence<I...>)
+    {
+      (void)std::initializer_list<int>{
+        ((void)encode_fun(std::get<I>(tu), std::get<I>(schema)), 0)...};
+    }
+
+    template <typename C, typename... E, typename... T>
+    inline void json_encode(C& ss, const std::tuple<T...>& tu, const json_tuple_<E...>& schema)
+    {
+      ss << '[';
+      bool first = true;
+      auto encode_one_element = [&first,&ss] (auto value, auto value_schema) {
+        if (!first)
+          ss << ',';
+        first = false;
+        if constexpr(decltype(json_is_value(value_schema)){}) {
+            json_encode_value(ss, value);
+          }
+        else
+          json_encode(ss, value, value_schema);
+      };
+
+      json_encode_tuple_elements(encode_one_element, tu, schema.elements, std::make_index_sequence<sizeof...(T)>{});
+      ss << ']';
+    }
+    
     template <typename C, typename O, typename E>
     inline void json_encode(C& ss, O obj, const json_object_<E>& schema)
     {

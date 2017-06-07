@@ -20,8 +20,6 @@ int main()
     assert(obj.test2 == "John");
   }
 
-  #if 0
-
   { // Double quote escape.
     std::string input = R"json({"test1":12,"test2":"John\""})json";
 
@@ -69,5 +67,30 @@ int main()
     assert(v[3] == 4);
   }
 
-  #endif
+  {
+    // plain vectors.
+    std::string input = R"json([{"test1":12}])json";
+
+    struct A { int test1; };
+
+    std::vector<A> v;
+    auto err = iod::json_vector(s::_test1).decode(input, v);
+    assert(!err);
+    assert(v.size() == 1);
+    assert(v[0].test1 == 12);
+  }
+
+  {
+    // tuples.
+    std::string input = R"json( [  42  ,  "foo" , 0 , 4 ] )json";
+    
+    std::tuple<int, std::string, bool, int> tu;
+    auto err = iod::json_decode(input, tu);
+    std::cout << std::get<1>(tu) << std::endl;
+    assert(!err);
+    assert(std::get<0>(tu) == 42);
+    assert(std::get<2>(tu) == 0);
+    assert(std::get<3>(tu) == 4);
+  }
+  
 }

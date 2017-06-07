@@ -98,6 +98,20 @@ namespace iod
     return json_vector_<decltype(obj)>{obj};
   }
 
+  template <typename... T>
+  struct json_tuple_ : public json_object_base<json_tuple_<T...>>
+  {
+    json_tuple_() = default;
+    json_tuple_(const T&... s) : elements(s...) {}
+    std::tuple<T...> elements;
+  };
+    
+  template <typename... S>
+  auto json_tuple(S&&... s)
+  {
+    return json_tuple_<S...>{s...};
+  }
+  
   struct json_key
   {
     inline json_key(const char* c) : key(c) {}

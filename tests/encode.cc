@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iod/metajson/metajson.hh>
+
 namespace s
 {
   IOD_SYMBOL(test1)
@@ -65,4 +66,27 @@ int main()
     std::string input = R"json([1,2,3,4])json";
     assert(iod::json_encode(std::vector<int>{1,2,3,4}) == input);
   }
+  
+  {
+    // tuples.
+    std::string input = R"json([42,"foo",0])json";
+    assert(iod::json_encode(std::make_tuple(42,"foo",0)) == input);
+  }
+
+  {
+    // nested tuples.
+    std::string input = R"json([42,"foo",0,[32,"Bob"]])json";
+    assert(iod::json_encode(std::make_tuple(42,"foo",0, std::make_tuple(32,"Bob"))) == input);
+  }
+
+  {
+    // tuples with struct element.
+    std::string input = R"json(["Alice",{"test1":11,"test2":"Bob"}])json";
+
+    struct A { int test1; std::string test2; };
+    auto A_json = json_object(s::_test1, s::_test2);
+    auto tu = std::make_tuple("Alice", A{11, "Bob"});
+    assert(iod::json_tuple(std::string(), A_json).encode(tu) == input);
+  }
+  
 }
