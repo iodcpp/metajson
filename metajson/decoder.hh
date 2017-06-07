@@ -107,7 +107,7 @@ namespace iod
         first = false;
 
         obj.resize(obj.size() + 1);
-        if ((err = json_decode2(p, obj.back(), obj.back()))) return err;
+        if ((err = json_decode2(p, obj.back(), S{}))) return err;
         p.eat_spaces();
       }
       
@@ -115,6 +115,7 @@ namespace iod
       else
         return json_ok;
     }
+
     
     template <typename P, typename O, typename S>
     json_error json_decode2(P& p, O& obj, json_object_<S> schema)
