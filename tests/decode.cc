@@ -86,7 +86,6 @@ int main()
     
     std::tuple<int, std::string, bool, int> tu;
     auto err = iod::json_decode(input, tu);
-    std::cout << std::get<1>(tu) << std::endl;
     assert(!err);
     assert(std::get<0>(tu) == 42);
     assert(std::get<2>(tu) == 0);
