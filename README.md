@@ -4,16 +4,15 @@ iod::metajson
 iod::metajson is a C++17 JSON serializer/deserializer designed for
 ease of use and performances.
 
-Unlike others serialization libraries, it does not rely on dynamic
-hashtables to store objects, but on plain static C++ objects. This
-makes it faster to execute, easier to use, faster to compile and
-lighter (w.r.t. binary code size) than the existing C++ JSON libraries.
+It handle a subset of other JSON serialization libraries: **Only cases
+where the structure of the object is known at compile time are covered**.
+It these specific cases, metajson is faster and produce smaller binaries.
 
 **Features:**
   - Header only
   - UTF-8 support
   - Exception free
-  - Small codebase: 1200 LOC (~10x smaller than nlohmann/json [1] and rapidjson [2])
+  - Small codebase: 1200 LOC
   - Portable: No architecture specific code.
 
 **Limitations:**
@@ -22,14 +21,20 @@ lighter (w.r.t. binary code size) than the existing C++ JSON libraries.
   - No explicit errors for ill-formatted json messsages.
 
 **Performances:** Up to **9x** faster than nlohmann/json and **2x**
-  faster than rapidjson. I did not find usecases where metajson was
+  faster than rapidjson*. I did not find usecases where metajson was
   not the fastest. If you find some, please report.
 
-**Code size:** Up to **8x** smaller than nlohmann/json and **2x** smaller than rapidjson.
+**Binary code size:** Up to **8x** smaller than nlohmann/json and **2x** smaller than rapidjson*.
 
-[1] https://github.com/nlohmann/json
+[1] https://github.com/miloyip/rapidjson
 
-[2] https://github.com/miloyip/rapidjson
+[2] https://github.com/nlohmann/json
+
+[3] https://github.com/AlDanial/cloc
+
+\* Theses numbers are not given by an comprehensive benchmark. They just give a rough idea
+of metajson performances and does not take into account the fact that other libraries provides
+more features.
 
 Author
 ============================
