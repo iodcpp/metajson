@@ -7,16 +7,17 @@
 
 #pragma once
 
-#include <experimental/tuple>
 #include <functional>
-#include <cmath>
-#include <string>
-#include <experimental/string_view>
-#include <sstream>
-#include <vector>
 #include <cstring>
-#include <cassert>
 #include <utility>
+#include <vector>
+#include <sstream>
+#include <experimental/string_view>
+#include <experimental/tuple>
+#include <cmath>
+#include <memory>
+#include <string>
+#include <cassert>
 
 
 
@@ -600,7 +601,7 @@ namespace iod
       auto elt = to_json_schema(decltype(arr[0]){});
       return json_vector_<decltype(elt)>{elt};
     }
-
+    
     template <typename... V>
     auto to_json_schema(const std::tuple<V...>& arr)
     {
@@ -734,19 +735,12 @@ namespace iod
         10000000000000,
         100000000000000,
         1000000000000000,
-        10000000000000000
+        10000000000000000,
+        100000000000000000
       };
 
-      if (e < 17)
+      if (e < 18)
         return pows[e];
-      else
-      {
-        unsigned long res = 1;
-        int i = 0;
-        for (;i < e; i++)
-          res *= 10;
-        return res;
-      }
     }
     
     template <typename F>
@@ -758,16 +752,17 @@ namespace iod
       const char* it = str;
       int integer_part;
       parse_int(&integer_part, it, &it);
+      int sign = integer_part >= 0 ? 1 : -1;
       *f = integer_part;
       if (*it == '.')
       {
         it++;
-        unsigned int decimal_part;
+        unsigned long long decimal_part;
         const char* dec_end;
         parse_uint(&decimal_part, it, &dec_end);
-        
+
         if (dec_end > it)
-          *f += F(decimal_part) / pow10(dec_end - it);
+          *f += (F(decimal_part) / pow10(dec_end - it)) * sign;
 
         it = dec_end;
       }
@@ -888,39 +883,24 @@ namespace iod
 namespace iod
 {
 
-  // enum JSON_ERROR
-  // {
-  //   JSON_OK = 0
-  //   //JSON_
-  // }
+  enum json_error_code
+  {
+    JSON_OK = 0,
+    JSON_KO = 1
+  };
     
   struct json_error
   {
     json_error& operator=(const json_error&) = default;
     operator bool() { return code != 0; }
-    int code; //const char* what;
-    //std::string what;
+    int code;
+    std::string what;
   };
-  
-  // json_error make_json_error(const char* what) { return {1, std::string("metajson error: ") + what}; }
-  // json_error json_no_error() { return {0, ""}; }
 
-  json_error make_json_error(const char* what) { return {1}; }
-  json_error json_no_error() { return {0}; }
+  int make_json_error(const char* what) { return 1; }
+  int json_no_error() { return 0; }
 
-  static json_error json_ok = json_no_error();
-  
-  template <typename... W>
-  auto make_json_error(W... what)
-  {
-    // std::stringstream ss;
-
-    // ss << "metajson error: ";
-    // auto add = [&ss] (auto w) { ss << w; };
-    // apply_each(add, what...);
-    //return json_error{1, ss.str()};
-    return json_error{1};
-  }
+  static int json_ok = json_no_error();
 
 }
 
@@ -1045,7 +1025,7 @@ namespace iod
     {
       // Convert a JSON string into an UTF-8 string.
       if (s.get() != '"')
-        return make_json_error("json_to_utf8: JSON strings should start with a double quote.");
+        return JSON_KO;//make_json_error("json_to_utf8: JSON strings should start with a double quote.");
       
       while (true)
       {
@@ -1054,13 +1034,13 @@ namespace iod
           o.append(s.get());
 
         // If eof found before the end of the string, return an error.
-        if (s.eof()) return make_json_error("json_to_utf8: Unexpected end of string when parsing a string.");
+        if (s.eof()) return JSON_KO;// make_json_error("json_to_utf8: Unexpected end of string when parsing a string.");
 
         // If end of json string, return
         if (s.peek() == '"')
         {
           break;
-          return json_no_error();
+          return JSON_OK;
         }
 
         // Get the '\'.
@@ -1071,7 +1051,7 @@ namespace iod
         {
           // List of escaped char from http://www.json.org/ 
         default:
-          return make_json_error("json_to_utf8: Bad JSON escaped character.");
+          return JSON_KO;//make_json_error("json_to_utf8: Bad JSON escaped character.");
         case '"': o.append('"'); break;
         case '\\': o.append('\\'); break;
         case '/': o.append('/'); break;
@@ -1089,7 +1069,7 @@ namespace iod
           d = s.get();
 
           if (s.eof())
-            return make_json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
+            return JSON_KO;//make_json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
 
           auto decode_hex_c = [] (char c) {
             if (c >= '0' and c <= '9') return c - '0';
@@ -1106,7 +1086,7 @@ namespace iod
           if (x >= 0xD800 and x <= 0xDBFF)
           {
             if (s.get() != '\\' or s.get() != 'u')
-              return make_json_error("json_to_utf8: Missing low surrogate.");
+              return JSON_KO;//make_json_error("json_to_utf8: Missing low surrogate.");
           
             uint16_t y =
               (decode_hex_c(s.get()) << 12) +
@@ -1115,7 +1095,7 @@ namespace iod
               decode_hex_c(s.get());
 
             if (s.eof())
-              return make_json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
+              return JSON_KO;//make_json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
 
             x -= 0xD800;
             y -= 0xDC00;
@@ -1147,16 +1127,16 @@ namespace iod
               o.append(0b10000000 | (x & 0x003F));
             }
             else
-              return make_json_error("json_to_utf8: Bad UTF8 codepoint.");            
+              return JSON_KO;//make_json_error("json_to_utf8: Bad UTF8 codepoint.");            
           }
           break;
         }
       }
 
       if (s.get() != '"')
-        return make_json_error("JSON strings must end with a double quote.");
+        return JSON_KO;//make_json_error("JSON strings must end with a double quote.");
     
-      return json_no_error();
+      return JSON_OK;//json_no_error();
     }
 
     template <typename S, typename T>
@@ -1211,7 +1191,7 @@ namespace iod
             if (cp >= 0x0080 and cp <= 0x07FF)
               encode_16bits(cp);
             else
-              return make_json_error("utf8_to_json: Bad UTF8 codepoint.");
+              return JSON_KO;//make_json_error("utf8_to_json: Bad UTF8 codepoint.");
           }
           else if (c1 < 0b11110000) // 16 bits - 3 char: 1110xxxx	10xxxxxx	10xxxxxx
           {
@@ -1222,7 +1202,7 @@ namespace iod
             if (cp >= 0x0800 and cp <= 0xFFFF)
               encode_16bits(cp);
             else
-              return make_json_error("utf8_to_json: Bad UTF8 codepoint.");          
+              return JSON_KO;//make_json_error("utf8_to_json: Bad UTF8 codepoint.");          
           }
           else // 21 bits - 4 chars: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
           {
@@ -1252,7 +1232,7 @@ namespace iod
         }
       }
       o.append('"');
-      return json_no_error();
+      return JSON_OK;
     }
   }
 }
@@ -1281,16 +1261,26 @@ namespace iod
       }
       
       inline bool eof() { return ss.eof(); }
-      inline json_error eat(char c, bool skip_spaces = true) {
+      inline json_error_code eat(char c, bool skip_spaces = true) {
         if (skip_spaces)
           eat_spaces();
 
         char g = ss.get();
         if (g != c)
           return make_json_error("Unexpected char. Got '", char(g), "' expected ", c);
-        return json_ok;
+        return JSON_OK;
       }
 
+      template <typename... T>
+      inline json_error_code make_json_error(T&&... t)
+      {
+        if (!error_stream)
+          error_stream = new std::stringstream();
+        *error_stream << "metajson error: ";
+        auto add = [this] (auto w) { *error_stream << w; };
+        apply_each(add, t...);
+        return JSON_KO;
+      }
       inline void eat_spaces()
       {
         while (ss.peek() >= 0 and ss.peek() < 33) ss.get();
@@ -1301,7 +1291,7 @@ namespace iod
 
       // Integers and floating points.
       template <typename T>
-      json_error fill(T& t) {
+      json_error_code fill(T& t) {
 
         if constexpr(std::is_floating_point<T>::value or
                      std::is_integral<T>::value or
@@ -1310,7 +1300,7 @@ namespace iod
             ss >> t;
             if (ss.bad())
               return make_json_error("Ill-formated value.");
-            return json_ok;
+            return JSON_OK;
           }
         else
           // The JSON decoder only parses floating-point, integral and string types.
@@ -1318,7 +1308,7 @@ namespace iod
       }
 
       // Strings
-      inline json_error fill(std::string& str)
+      inline json_error_code fill(std::string& str)
       {
         eat_spaces();
         str.clear();
@@ -1326,20 +1316,23 @@ namespace iod
       }
       
       S& ss;
+      std::stringstream* error_stream = nullptr;
     };
 
     template <typename P, typename O, typename S>
-    json_error json_decode2(P& p, O& obj, S)
+    json_error_code json_decode2(P& p, O& obj, S)
     {
       auto err = p.fill(obj);
       if (err) return err;
       else
-        return json_ok;
+        return JSON_OK;
     }
     
     template <typename P, typename O, typename S>
-    json_error json_decode2(P& p, O& obj, json_vector_<S> schema)
+    json_error_code json_decode2(P& p, O& obj, json_vector_<S> schema)
     {
+      obj.clear();
+      obj.reserve(2);
       bool first = true;
       auto err = p.eat('[');
       if (err) return err;
@@ -1360,7 +1353,7 @@ namespace iod
       
       if ((err = p.eat(']'))) return err;
       else
-        return json_ok;
+        return JSON_OK;
     }
 
     template <typename F, typename... E, typename... T, std::size_t... I>
@@ -1374,7 +1367,7 @@ namespace iod
     }
     
     template <typename P, typename... O, typename... S>
-    json_error json_decode2(P& p, std::tuple<O...>& tu, json_tuple_<S...> schema)
+    json_error_code json_decode2(P& p, std::tuple<O...>& tu, json_tuple_<S...> schema)
     {
       bool first = true;
       auto err = p.eat('[');
@@ -1394,17 +1387,17 @@ namespace iod
 
       if ((err = p.eat(']'))) return err;
       else
-        return json_ok;
+        return JSON_OK;
     }
     
     
     template <typename P, typename O, typename S>
-    json_error json_decode2(P& p, O& obj, json_object_<S> schema)
+    json_error_code json_decode2(P& p, O& obj, json_object_<S> schema)
     {
-      json_error err;
+      json_error_code err;
       if ((err = p.eat('{'))) return err;
 
-      struct attr_info { bool filled; const char* name; int name_len; std::function<json_error(P&)> parse_value; };
+      struct attr_info { bool filled; const char* name; int name_len; std::function<json_error_code(P&)> parse_value; };
       constexpr int n_members = std::tuple_size<decltype(schema.schema)>();
       attr_info A[n_members];
       int i = 0;
@@ -1418,8 +1411,14 @@ namespace iod
           }
         
         A[i].parse_value = [m,&obj] (P& p) {
-          if (auto err = p.fill(symbol_member_access(obj, m.name))) return err;
-          else return json_ok;
+          if constexpr(decltype(json_is_value(symbol_member_access(obj, m.name))){}) {
+            if (auto err = p.fill(symbol_member_access(obj, m.name))) return err;
+            else return JSON_OK;
+            }
+          else {
+              if (auto err = json_decode2(p, symbol_member_access(obj, m.name), m.type)) return err;
+              else return JSON_OK;
+          }
         };
 
         i++;
@@ -1447,7 +1446,7 @@ namespace iod
           {
             if ((err = p.eat(':'))) return err;
             if (A[i].filled)
-              return make_json_error("Duplicate json key: ", A[i].name);
+              return p.make_json_error("Duplicate json key: ", A[i].name);
             
             if ((err = A[i].parse_value(p))) return err;
             A[i].filled = true;
@@ -1457,7 +1456,7 @@ namespace iod
         }
         
         if (!found)
-          return make_json_error("Unknown json key");
+          return p.make_json_error("Unknown json key");
         p.eat_spaces();
         if (p.peek() == ',')
         {
@@ -1466,7 +1465,7 @@ namespace iod
       }
       if ((err = p.eat('}'))) return err;
 
-      return json_ok;
+      return JSON_OK;
     }
 
     template <typename C, typename O, typename S>
@@ -1474,9 +1473,12 @@ namespace iod
     {
       auto stream = decode_stringstream(input);
       json_parser<decode_stringstream> p(stream);
-      return json_decode2(p, obj, schema);
+      if (json_decode2(p, obj, schema))
+        return json_error{1, p.error_stream ? p.error_stream->str() : "Json error"};
+      else
+        return json_error{0};
     }
-    
+
   }
 
 }
