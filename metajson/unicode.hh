@@ -129,7 +129,7 @@ namespace iod
     {
       // Convert a JSON string into an UTF-8 string.
       if (s.get() != '"')
-        return make_json_error("json_to_utf8: JSON strings should start with a double quote.");
+        return JSON_KO;//make_json_error("json_to_utf8: JSON strings should start with a double quote.");
       
       while (true)
       {
@@ -138,13 +138,13 @@ namespace iod
           o.append(s.get());
 
         // If eof found before the end of the string, return an error.
-        if (s.eof()) return make_json_error("json_to_utf8: Unexpected end of string when parsing a string.");
+        if (s.eof()) return JSON_KO;// make_json_error("json_to_utf8: Unexpected end of string when parsing a string.");
 
         // If end of json string, return
         if (s.peek() == '"')
         {
           break;
-          return json_no_error();
+          return JSON_OK;
         }
 
         // Get the '\'.
@@ -155,7 +155,7 @@ namespace iod
         {
           // List of escaped char from http://www.json.org/ 
         default:
-          return make_json_error("json_to_utf8: Bad JSON escaped character.");
+          return JSON_KO;//make_json_error("json_to_utf8: Bad JSON escaped character.");
         case '"': o.append('"'); break;
         case '\\': o.append('\\'); break;
         case '/': o.append('/'); break;
@@ -173,7 +173,7 @@ namespace iod
           d = s.get();
 
           if (s.eof())
-            return make_json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
+            return JSON_KO;//make_json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
 
           auto decode_hex_c = [] (char c) {
             if (c >= '0' and c <= '9') return c - '0';
@@ -190,7 +190,7 @@ namespace iod
           if (x >= 0xD800 and x <= 0xDBFF)
           {
             if (s.get() != '\\' or s.get() != 'u')
-              return make_json_error("json_to_utf8: Missing low surrogate.");
+              return JSON_KO;//make_json_error("json_to_utf8: Missing low surrogate.");
           
             uint16_t y =
               (decode_hex_c(s.get()) << 12) +
@@ -199,7 +199,7 @@ namespace iod
               decode_hex_c(s.get());
 
             if (s.eof())
-              return make_json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
+              return JSON_KO;//make_json_error("json_to_utf8: Unexpected end of string when decoding an utf8 character");
 
             x -= 0xD800;
             y -= 0xDC00;
@@ -231,16 +231,16 @@ namespace iod
               o.append(0b10000000 | (x & 0x003F));
             }
             else
-              return make_json_error("json_to_utf8: Bad UTF8 codepoint.");            
+              return JSON_KO;//make_json_error("json_to_utf8: Bad UTF8 codepoint.");            
           }
           break;
         }
       }
 
       if (s.get() != '"')
-        return make_json_error("JSON strings must end with a double quote.");
+        return JSON_KO;//make_json_error("JSON strings must end with a double quote.");
     
-      return json_no_error();
+      return JSON_OK;//json_no_error();
     }
 
     template <typename S, typename T>
@@ -295,7 +295,7 @@ namespace iod
             if (cp >= 0x0080 and cp <= 0x07FF)
               encode_16bits(cp);
             else
-              return make_json_error("utf8_to_json: Bad UTF8 codepoint.");
+              return JSON_KO;//make_json_error("utf8_to_json: Bad UTF8 codepoint.");
           }
           else if (c1 < 0b11110000) // 16 bits - 3 char: 1110xxxx	10xxxxxx	10xxxxxx
           {
@@ -306,7 +306,7 @@ namespace iod
             if (cp >= 0x0800 and cp <= 0xFFFF)
               encode_16bits(cp);
             else
-              return make_json_error("utf8_to_json: Bad UTF8 codepoint.");          
+              return JSON_KO;//make_json_error("utf8_to_json: Bad UTF8 codepoint.");          
           }
           else // 21 bits - 4 chars: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
           {
@@ -336,7 +336,7 @@ namespace iod
         }
       }
       o.append('"');
-      return json_no_error();
+      return JSON_OK;
     }
   }
 }

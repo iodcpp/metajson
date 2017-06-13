@@ -20,7 +20,7 @@ double test_float(const char* str)
   double f;
   const char* end;
   iod::internal::parse_float(&f, str, &end);
-  std::cout << std::setprecision(20)  << std::fixed << f << std::endl;
+  std::cout << std::string(str, end) << " -> " << std::setprecision(20)  << std::fixed << f << std::endl;
   assert((end - str) == strlen(str));
   return f;
 }
@@ -49,6 +49,7 @@ int main()
   TESTF(1.21e10);
   TESTF(1.21e-10);
   TESTF(1234567890.1234567890);
+  TESTF(-1234567890.1234567890);
   
   assert(test_float("1E-10") == test_float("1e-10"));
 }

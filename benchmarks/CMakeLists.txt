@@ -16,6 +16,9 @@ target_link_libraries(parse_float benchmark pthread)
 add_executable(simple_json simple_json.cc)
 target_link_libraries(simple_json benchmark pthread)
 
+add_executable(canada canada.cc)
+target_link_libraries(canada benchmark pthread)
+
 add_executable(decode_int_array decode_int_array.cc)
 target_link_libraries(decode_int_array benchmark pthread)
 

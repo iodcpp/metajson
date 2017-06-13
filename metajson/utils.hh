@@ -55,7 +55,7 @@ namespace iod
       auto elt = to_json_schema(decltype(arr[0]){});
       return json_vector_<decltype(elt)>{elt};
     }
-
+    
     template <typename... V>
     auto to_json_schema(const std::tuple<V...>& arr)
     {

@@ -52,9 +52,9 @@ static void bench_rapidjson(benchmark::State& state) {
   {
     rapidjson::Document d;
     d.Parse<0>(json_str);
-    // obj.test1 = d["test1"].GetInt();
-    // obj.test2 = d["test2"].GetInt();
-    // obj.test3 = d["test3"].GetString();
+    obj.test1 = d["test1"].GetInt();
+    obj.test2 = d["test2"].GetInt();
+    obj.test3 = d["test3"].GetString();
   }
 }
 
@@ -67,9 +67,9 @@ static void bench_nlohmann_json(benchmark::State& state) {
   while (state.KeepRunning())
   {
     auto d = nlohmann::json::parse(json_str);
-    // obj.test1 = d["test1"];
-    // obj.test2 = d["test2"];
-    // obj.test3 = d["test3"];
+    obj.test1 = d["test1"];
+    obj.test2 = d["test2"];
+    obj.test3 = d["test3"];
   }
 }
 

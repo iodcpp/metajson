@@ -61,19 +61,12 @@ namespace iod
         10000000000000,
         100000000000000,
         1000000000000000,
-        10000000000000000
+        10000000000000000,
+        100000000000000000
       };
 
-      if (e < 17)
+      if (e < 18)
         return pows[e];
-      else
-      {
-        unsigned long res = 1;
-        int i = 0;
-        for (;i < e; i++)
-          res *= 10;
-        return res;
-      }
     }
     
     template <typename F>
@@ -85,16 +78,17 @@ namespace iod
       const char* it = str;
       int integer_part;
       parse_int(&integer_part, it, &it);
+      int sign = integer_part >= 0 ? 1 : -1;
       *f = integer_part;
       if (*it == '.')
       {
         it++;
-        unsigned int decimal_part;
+        unsigned long long decimal_part;
         const char* dec_end;
         parse_uint(&decimal_part, it, &dec_end);
-        
+
         if (dec_end > it)
-          *f += F(decimal_part) / pow10(dec_end - it);
+          *f += (F(decimal_part) / pow10(dec_end - it)) * sign;
 
         it = dec_end;
       }

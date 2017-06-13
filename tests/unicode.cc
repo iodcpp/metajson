@@ -39,7 +39,7 @@ void test_ascii(uint16_t c)
 
     // c should convert to "c"
     auto err = iod::utf8_to_json(stream, out);
-    assert(err.code == 0);
+    assert(err == 0);
     assert(out == ref.s);
 
     // and convert back to c without quote.
@@ -47,7 +47,7 @@ void test_ascii(uint16_t c)
     stream.str(ref.s);
     out = "";
     err = iod::json_to_utf8(stream, out);
-    assert(err.code == 0);
+    assert(err == 0);
     assert(out[0] == c and out.size() == 1);
   }
 
@@ -58,7 +58,7 @@ void test_ascii(uint16_t c)
     stream << "\"\\u" << std::hex << std::setfill('0') << std::setw(4) << c << '"';
 
     auto err = iod::json_to_utf8(stream, out);
-    assert(err.code == 0);
+    assert(err == 0);
     assert(out[0] == c and out.size() == 1);
   }
   
@@ -75,7 +75,7 @@ std::string json_to_utf8(std::string s)
   auto err = iod::json_to_utf8(stream, out);
   // if (err.code)
   //   std::cerr << err.what << std::endl;
-  assert(err.code == 0);
+  assert(err == 0);
   return out;
 }
 
@@ -88,9 +88,9 @@ std::string utf8_to_json(std::string s)
 
   // c should convert to "c"
   auto err = iod::utf8_to_json(stream, out);
-  // if (err.code)
+  // if (err)
   //   std::cerr << err.what << std::endl;
-  assert(err.code == 0);
+  assert(err == 0);
   return out;
 }
 
@@ -169,7 +169,7 @@ int main()
     std::string out;
     std::stringstream stream(R"("\u000a")");
     auto err = iod::json_to_utf8(stream, out);
-    assert(err.code == 0);
+    assert(err == 0);
     assert(out == "\x0a");
   }
 
@@ -178,7 +178,7 @@ int main()
     std::string out;
     std::stringstream stream(R"("\u000A")");
     auto err = iod::json_to_utf8(stream, out);
-    assert(err.code == 0);
+    assert(err == 0);
     assert(out == "\x0a");
   }
 
