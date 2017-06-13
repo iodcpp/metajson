@@ -9,6 +9,7 @@ where the structure of the object is known at compile time are covered**.
 It these specific cases, metajson is faster and produce smaller binaries.
 
 **Features:**
+  - Non intrusive
   - Header only
   - UTF-8 support
   - Exception free
