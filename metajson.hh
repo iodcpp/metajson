@@ -7,17 +7,17 @@
 
 #pragma once
 
-#include <functional>
-#include <cstring>
-#include <utility>
-#include <vector>
-#include <sstream>
-#include <experimental/string_view>
-#include <experimental/tuple>
-#include <cmath>
-#include <memory>
 #include <string>
+#include <utility>
+#include <cmath>
+#include <sstream>
+#include <experimental/tuple>
+#include <vector>
+#include <functional>
 #include <cassert>
+#include <memory>
+#include <cstring>
+#include <experimental/string_view>
 
 
 
@@ -672,6 +672,12 @@ namespace iod
   template <typename E> constexpr auto json_is_value(json_vector_<E>) ->  std::false_type { return {}; }
   template <typename... E> constexpr auto json_is_value(json_tuple_<E...>) ->  std::false_type { return {}; }
   template <typename E> constexpr auto json_is_value(E) ->  std::true_type { return {}; }
+
+
+  template <typename T>
+  constexpr auto is_std_optional(std::optional<T>) -> std::true_type;
+  template <typename T>
+  constexpr auto is_std_optional(T) -> std::false_type;
   
 }
 
@@ -893,6 +899,8 @@ namespace iod
   {
     json_error& operator=(const json_error&) = default;
     operator bool() { return code != 0; }
+    bool good() { return code == 0; }
+    bool bad() { return code != 0; }
     int code;
     std::string what;
   };
@@ -1314,6 +1322,13 @@ namespace iod
         str.clear();
         return json_to_utf8(ss, str);
       }
+
+      template <typename T>
+      inline json_error_code fill(std::optional<T>& opt)
+      {
+        opt.emplace();
+        return fill(opt.value());
+      }
       
       S& ss;
       std::stringstream* error_stream = nullptr;
@@ -1390,26 +1405,30 @@ namespace iod
         return JSON_OK;
     }
     
-    
     template <typename P, typename O, typename S>
     json_error_code json_decode2(P& p, O& obj, json_object_<S> schema)
     {
       json_error_code err;
       if ((err = p.eat('{'))) return err;
 
-      struct attr_info { bool filled; const char* name; int name_len; std::function<json_error_code(P&)> parse_value; };
+      struct attr_info { bool filled; bool required; const char* name; int name_len; std::function<json_error_code(P&)> parse_value; };
       constexpr int n_members = std::tuple_size<decltype(schema.schema)>();
       attr_info A[n_members];
       int i = 0;
       auto prepare = [&] (auto m) {
         A[i].filled = false;
+        A[i].required = true;
         A[i].name = symbol_string(m.name);
         A[i].name_len = strlen(symbol_string(m.name));
 
         if constexpr(has_key(m, _json_key)) {
             A[i].name = m.json_key;
           }
-        
+
+        if constexpr(decltype(is_std_optional(symbol_member_access(obj, m.name))){}) {
+            A[i].required = false;
+          }
+
         A[i].parse_value = [m,&obj] (P& p) {
           if constexpr(decltype(json_is_value(symbol_member_access(obj, m.name))){}) {
             if (auto err = p.fill(symbol_member_access(obj, m.name))) return err;
@@ -1465,6 +1484,11 @@ namespace iod
       }
       if ((err = p.eat('}'))) return err;
 
+      for (int i = 0; i < n_members; i++)
+      {
+        if (A[i].required and !A[i].filled)
+          return p.make_json_error("Missing json key ", A[i].name);
+      }
       return JSON_OK;
     }
 
@@ -1501,7 +1525,7 @@ namespace iod
 
     template <typename T, typename C>
     inline void json_encode_value(C& ss, const T& t) { ss << t; }
-
+    
     template <typename C>
     inline void json_encode_value(C& ss, const char* s) { utf8_to_json(s, ss); }
 
@@ -1511,6 +1535,12 @@ namespace iod
     template <typename C>
     inline void json_encode_value(C& ss, const std::string& s) { utf8_to_json(s, ss); }
 
+    template <typename T, typename C>
+    inline void json_encode_value(C& ss, const std::optional<T>& t) {
+      assert(t.has_value());
+      json_encode_value(ss, t.value());
+    }
+    
     template <typename C, typename O, typename E>
     inline void json_encode(C& ss, O obj, const json_object_<E>& schema);
     
@@ -1570,6 +1600,11 @@ namespace iod
 
       auto encode_one_entity = [&] (auto e)
         {
+
+          if constexpr(decltype(is_std_optional(symbol_member_access(obj, e.name))){}) {
+              if (!symbol_member_access(obj, e.name).has_value()) return;
+            }
+
           if (!first) { ss << ','; }
           first = false; 
           if constexpr(has_key(e, _json_key)) {
