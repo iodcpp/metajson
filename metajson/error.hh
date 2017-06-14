@@ -16,6 +16,8 @@ namespace iod
   {
     json_error& operator=(const json_error&) = default;
     operator bool() { return code != 0; }
+    bool good() { return code == 0; }
+    bool bad() { return code != 0; }
     int code;
     std::string what;
   };

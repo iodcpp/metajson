@@ -25,7 +25,7 @@ namespace iod
 
     template <typename T, typename C>
     inline void json_encode_value(C& ss, const T& t) { ss << t; }
-
+    
     template <typename C>
     inline void json_encode_value(C& ss, const char* s) { utf8_to_json(s, ss); }
 
@@ -35,6 +35,12 @@ namespace iod
     template <typename C>
     inline void json_encode_value(C& ss, const std::string& s) { utf8_to_json(s, ss); }
 
+    template <typename T, typename C>
+    inline void json_encode_value(C& ss, const std::optional<T>& t) {
+      assert(t.has_value());
+      json_encode_value(ss, t.value());
+    }
+    
     template <typename C, typename O, typename E>
     inline void json_encode(C& ss, O obj, const json_object_<E>& schema);
     
@@ -94,6 +100,11 @@ namespace iod
 
       auto encode_one_entity = [&] (auto e)
         {
+
+          if constexpr(decltype(is_std_optional(symbol_member_access(obj, e.name))){}) {
+              if (!symbol_member_access(obj, e.name).has_value()) return;
+            }
+
           if (!first) { ss << ','; }
           first = false; 
           if constexpr(has_key(e, _json_key)) {

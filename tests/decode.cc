@@ -91,5 +91,18 @@ int main()
     assert(std::get<2>(tu) == 0);
     assert(std::get<3>(tu) == 4);
   }
+
+
+  {
+    // optional.
+    auto obj = iod::make_metamap(s::_test1 = std::optional<std::string>());
+    auto err = iod::json_decode("{}", obj);
+    assert(err.good());
+    assert(!obj.test1.has_value());
+    err = iod::json_decode("{\"test1\": \"Hooh\"}", obj);
+    assert(err.good());
+    assert(obj.test1.has_value());
+    assert(obj.test1.value() == "Hooh");
+  }
   
 }

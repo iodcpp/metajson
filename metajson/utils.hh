@@ -126,5 +126,11 @@ namespace iod
   template <typename E> constexpr auto json_is_value(json_vector_<E>) ->  std::false_type { return {}; }
   template <typename... E> constexpr auto json_is_value(json_tuple_<E...>) ->  std::false_type { return {}; }
   template <typename E> constexpr auto json_is_value(E) ->  std::true_type { return {}; }
+
+
+  template <typename T>
+  constexpr auto is_std_optional(std::optional<T>) -> std::true_type;
+  template <typename T>
+  constexpr auto is_std_optional(T) -> std::false_type;
   
 }

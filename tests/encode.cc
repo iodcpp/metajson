@@ -88,5 +88,14 @@ int main()
     auto tu = std::make_tuple("Alice", A{11, "Bob"});
     assert(iod::json_tuple(std::string(), A_json).encode(tu) == input);
   }
-  
+
+  {
+    // Optionals.
+    struct { std::optional<std::string> test2; } x;
+    assert(iod::json_object(s::_test2).encode(x) == "{}");
+
+    x.test2 = "he";
+    assert(iod::json_object(s::_test2).encode(x) == R"json({"test2":"he"})json");
+    
+  }
 }
