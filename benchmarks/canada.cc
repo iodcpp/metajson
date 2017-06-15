@@ -47,8 +47,9 @@ static void metajson(benchmark::State& state) {
 
   auto json_canada = make_metamap(s::_type = std::string(),
                                   s::_features = { make_metamap(s::_type = std::string(),
-                                                              s::_properties = make_metamap(_name = std::string()),
+                                                                s::_properties = make_metamap(_name = std::string()),
                                                                 s::_geometry = json_geometry)} );
+
   while (state.KeepRunning())
   {
     iod::json_decode(json_str, json_canada);
@@ -59,6 +60,14 @@ static void bench_rapidjson(benchmark::State& state) {
   
   load_file();
 
+  auto json_geometry = make_metamap(s::_type = std::string(),
+                                    s::_coordinates = std::vector<std::vector<std::vector<float>>>());
+
+  auto json_canada = make_metamap(s::_type = std::string(),
+                                  s::_features = { make_metamap(s::_type = std::string(),
+                                                                s::_properties = make_metamap(_name = std::string()),
+                                                                s::_geometry = json_geometry)} );
+  
   auto obj = std::vector<std::vector<std::vector<float>>>();
   int cpt = 0;
   while (state.KeepRunning())
@@ -66,20 +75,31 @@ static void bench_rapidjson(benchmark::State& state) {
     obj.clear();
     rapidjson::Document d;
     d.Parse<0>(json_str.c_str());
+    json_canada.type = d["type"].GetString();
+    json_canada.features.clear();
+    
     const rapidjson::Value& features = d["features"];
     cpt = 0;
     for (auto& x : features.GetArray())
     {
-      obj.resize(obj.size() + 1);
+      auto& features_array = json_canada.features;
+      features_array.resize(features_array.size() + 1);
+      json_canada.features.back().type = x["type"].GetString();
+      json_canada.features.back().properties.name = x["properties"].GetString();
+      json_canada.features.back().geometry.type = x["geometry"]["type"].GetString();
       for (auto& y : x["geometry"]["coordinates"].GetArray())
       {
-        obj.back().resize(obj.back().size() + 1);
+        auto& coordinates_1 = features_array.back().geometry.coordinates;
+        coordinates_1.resize(coordinates_1.size() + 1);
         
         for (auto& z : y.GetArray())
         {
+          auto& coordinates_2 = coordinates_1.back();
+          coordinates_2.resize(coordinates_2.size() + 1);
           for (auto& a : z.GetArray())
           {
-            obj.back().back().push_back(a.GetFloat());
+            auto& coordinates_3 = coordinates_2.back();
+            coordinates_3.push_back(a.GetFloat());
             cpt++;
           }
         }
@@ -98,8 +118,8 @@ static void bench_nlohmann_json(benchmark::State& state) {
   }
 }
 
+BENCHMARK(metajson);
 BENCHMARK(bench_rapidjson);
 BENCHMARK(bench_nlohmann_json);
-BENCHMARK(metajson);
 
 BENCHMARK_MAIN();

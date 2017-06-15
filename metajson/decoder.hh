@@ -158,7 +158,6 @@ namespace iod
     json_error_code json_decode2(P& p, O& obj, json_vector_<S> schema)
     {
       obj.clear();
-      obj.reserve(2);
       bool first = true;
       auto err = p.eat('[');
       if (err) return err;
@@ -241,7 +240,7 @@ namespace iod
           }
 
         A[i].parse_value = [m,&obj] (P& p) {
-          if constexpr(decltype(json_is_value(symbol_member_access(obj, m.name))){}) {
+          if constexpr(decltype(has_key(m, _type)){} and decltype(json_is_value(m.type)){}) {
             if (auto err = p.fill(symbol_member_access(obj, m.name))) return err;
             else return JSON_OK;
             }
