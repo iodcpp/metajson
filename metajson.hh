@@ -7,17 +7,18 @@
 
 #pragma once
 
-#include <string>
-#include <utility>
-#include <cmath>
-#include <sstream>
-#include <experimental/tuple>
 #include <vector>
-#include <functional>
+#include <experimental/tuple>
+#include <cmath>
+#include <utility>
+#include <experimental/string_view>
+#include <string>
 #include <cassert>
 #include <memory>
 #include <cstring>
-#include <experimental/string_view>
+#include <variant>
+#include <sstream>
+#include <functional>
 
 
 
@@ -557,12 +558,10 @@ namespace iod
   template <typename T>
   struct json_object_base;
   
-  template <typename T>
-  struct json_object_;
-  template <typename T>
-  struct json_vector_;
-  template <typename... T>
-  struct json_tuple_;
+  template <typename T>    struct json_object_;
+  template <typename T>    struct json_vector_;
+  template <typename V>    struct json_value_;
+  template <typename... T> struct json_tuple_;
   struct json_key;
   
   namespace impl
@@ -586,10 +585,10 @@ namespace iod
     }
 
 
-    template <typename M>
-    auto to_json_schema(M m)
+    template <typename V>
+    auto to_json_schema(V v)
     {
-      return m;
+      return json_value_<V>{};
     }
 
     template <typename... M>
@@ -1279,6 +1278,22 @@ namespace iod
         return JSON_OK;
       }
 
+      inline json_error_code eat(const char* str, bool skip_spaces = true) {
+        if (skip_spaces)
+          eat_spaces();
+
+        const char* str_it = str;
+        while (*str_it)
+        {
+          char g = ss.get();
+          if (g != *str_it)
+            return make_json_error("Unexpected char. Got '", char(g), "' expected '",
+                                   *str_it, "' when parsing string ", str);
+          str_it++;
+        }
+        return JSON_OK;
+      }
+      
       template <typename... T>
       inline json_error_code make_json_error(T&&... t)
       {
@@ -1328,6 +1343,35 @@ namespace iod
       {
         opt.emplace();
         return fill(opt.value());
+      }
+
+      template <typename... T>
+      inline json_error_code fill(std::variant<T...>& v)
+      {
+        if (auto err = eat('{')) return err;
+        if (auto err = eat("\"idx\"")) return err;
+        if (auto err = eat(':')) return err;
+
+        int idx = 0;
+        fill(idx);
+        if (auto err = eat(',')) return err;
+        if (auto err = eat("\"value\"")) return err;
+        if (auto err = eat(':')) return err;
+
+        int cpt = 0;
+        apply_each([&] (auto* x) {
+            if (cpt == idx)
+            {
+              std::remove_pointer_t<decltype(x)> value{};
+              fill(value);
+              v = std::move(value);
+            }
+            cpt++;
+          },
+          (T*)nullptr...);
+
+        if (auto err = eat('}')) return err;
+        return JSON_OK;
       }
       
       S& ss;
@@ -1537,12 +1581,26 @@ namespace iod
 
     template <typename T, typename C>
     inline void json_encode_value(C& ss, const std::optional<T>& t) {
-      assert(t.has_value());
-      json_encode_value(ss, t.value());
+      if (t.has_value())
+        json_encode_value(ss, t.value());
+    }
+
+    template <typename C, typename... T>
+    inline void json_encode_value(C& ss, const std::variant<T...>& t) {
+      ss << "{\"idx\":" << t.index() << ",\"value\":";
+      std::visit([&] (auto&& value) { json_encode_value(ss, value); },
+                 t);      
+      ss << '}';
     }
     
     template <typename C, typename O, typename E>
     inline void json_encode(C& ss, O obj, const json_object_<E>& schema);
+
+    template <typename T, typename C, typename E>
+    inline void json_encode(C& ss, const T& value, const E& schema)
+    {
+      json_encode_value(ss, value);
+    }
     
     template <typename T, typename C, typename E>
     inline void json_encode(C& ss, const std::vector<T>& array, const json_vector_<E>& schema)
@@ -1709,6 +1767,19 @@ namespace iod
     return json_object_<decltype(members)>{members};
   }
 
+
+  template <typename V>
+  struct json_value_ : public json_object_base<json_value_<V>>
+  {
+    json_value_() = default;
+  };
+  
+  template <typename V>
+  auto json_value(V&& v)
+  {
+    return json_value_<V>{};
+  }
+  
   template <typename T>
   struct json_vector_ : public json_object_base<json_vector_<T>>
   {
