@@ -11,12 +11,10 @@ namespace iod
   template <typename T>
   struct json_object_base;
   
-  template <typename T>
-  struct json_object_;
-  template <typename T>
-  struct json_vector_;
-  template <typename... T>
-  struct json_tuple_;
+  template <typename T>    struct json_object_;
+  template <typename T>    struct json_vector_;
+  template <typename V>    struct json_value_;
+  template <typename... T> struct json_tuple_;
   struct json_key;
   
   namespace impl
@@ -40,10 +38,10 @@ namespace iod
     }
 
 
-    template <typename M>
-    auto to_json_schema(M m)
+    template <typename V>
+    auto to_json_schema(V v)
     {
-      return m;
+      return json_value_<V>{};
     }
 
     template <typename... M>

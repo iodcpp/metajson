@@ -98,4 +98,14 @@ int main()
     assert(iod::json_object(s::_test2).encode(x) == R"json({"test2":"he"})json");
     
   }
+
+  {
+    // Simple values.
+    assert(iod::json_encode(12) == "12");
+    assert(iod::json_encode("12") == "\"12\"");
+    assert(iod::json_encode(std::optional<int>{}) == "");
+    assert(iod::json_encode(std::optional<int>{12}) == "12");
+    assert(iod::json_encode(std::variant<int,std::string>{"abc"}) == R"json({"idx":1,"value":"abc"})json");
+    assert(iod::json_encode(std::variant<int,std::string>{42}) == R"json({"idx":0,"value":42})json");
+  }
 }

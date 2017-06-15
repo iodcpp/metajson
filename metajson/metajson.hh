@@ -83,6 +83,19 @@ namespace iod
     return json_object_<decltype(members)>{members};
   }
 
+
+  template <typename V>
+  struct json_value_ : public json_object_base<json_value_<V>>
+  {
+    json_value_() = default;
+  };
+  
+  template <typename V>
+  auto json_value(V&& v)
+  {
+    return json_value_<V>{};
+  }
+  
   template <typename T>
   struct json_vector_ : public json_object_base<json_vector_<T>>
   {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <variant>
 #include <experimental/tuple>
 #include <experimental/string_view>
 #include <iod/metamap/metamap.hh>
@@ -37,12 +38,26 @@ namespace iod
 
     template <typename T, typename C>
     inline void json_encode_value(C& ss, const std::optional<T>& t) {
-      assert(t.has_value());
-      json_encode_value(ss, t.value());
+      if (t.has_value())
+        json_encode_value(ss, t.value());
+    }
+
+    template <typename C, typename... T>
+    inline void json_encode_value(C& ss, const std::variant<T...>& t) {
+      ss << "{\"idx\":" << t.index() << ",\"value\":";
+      std::visit([&] (auto&& value) { json_encode_value(ss, value); },
+                 t);      
+      ss << '}';
     }
     
     template <typename C, typename O, typename E>
     inline void json_encode(C& ss, O obj, const json_object_<E>& schema);
+
+    template <typename T, typename C, typename E>
+    inline void json_encode(C& ss, const T& value, const E& schema)
+    {
+      json_encode_value(ss, value);
+    }
     
     template <typename T, typename C, typename E>
     inline void json_encode(C& ss, const std::vector<T>& array, const json_vector_<E>& schema)

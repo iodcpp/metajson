@@ -104,5 +104,17 @@ int main()
     assert(obj.test1.has_value());
     assert(obj.test1.value() == "Hooh");
   }
+
+
+  {
+    // Variant.
+    auto obj = iod::make_metamap(s::_test1 = std::variant<int, std::string>("abc"));
+
+    assert(iod::json_decode(R"json({"test1":{"idx":1,"value":"abc"}})json", obj).good());
+    assert(std::get<std::string>(obj.test1) == "abc");
+
+    assert(iod::json_decode(R"json({"test1":{"idx":0,"value":42}})json", obj).good());
+    assert(std::get<int>(obj.test1) == 42);
+  }
   
 }

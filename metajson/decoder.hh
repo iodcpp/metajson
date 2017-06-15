@@ -3,6 +3,7 @@
 #include <functional>
 #include <cstring>
 #include <utility>
+#include <variant>
 #include <experimental/string_view>
 #include <iod/metamap/metamap.hh>
 #include <iod/metajson/utils.hh>
@@ -44,6 +45,22 @@ namespace iod
         return JSON_OK;
       }
 
+      inline json_error_code eat(const char* str, bool skip_spaces = true) {
+        if (skip_spaces)
+          eat_spaces();
+
+        const char* str_it = str;
+        while (*str_it)
+        {
+          char g = ss.get();
+          if (g != *str_it)
+            return make_json_error("Unexpected char. Got '", char(g), "' expected '",
+                                   *str_it, "' when parsing string ", str);
+          str_it++;
+        }
+        return JSON_OK;
+      }
+      
       template <typename... T>
       inline json_error_code make_json_error(T&&... t)
       {
@@ -93,6 +110,35 @@ namespace iod
       {
         opt.emplace();
         return fill(opt.value());
+      }
+
+      template <typename... T>
+      inline json_error_code fill(std::variant<T...>& v)
+      {
+        if (auto err = eat('{')) return err;
+        if (auto err = eat("\"idx\"")) return err;
+        if (auto err = eat(':')) return err;
+
+        int idx = 0;
+        fill(idx);
+        if (auto err = eat(',')) return err;
+        if (auto err = eat("\"value\"")) return err;
+        if (auto err = eat(':')) return err;
+
+        int cpt = 0;
+        apply_each([&] (auto* x) {
+            if (cpt == idx)
+            {
+              std::remove_pointer_t<decltype(x)> value{};
+              fill(value);
+              v = std::move(value);
+            }
+            cpt++;
+          },
+          (T*)nullptr...);
+
+        if (auto err = eat('}')) return err;
+        return JSON_OK;
       }
       
       S& ss;
