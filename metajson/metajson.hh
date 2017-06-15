@@ -89,7 +89,8 @@ namespace iod
   {
     json_value_() = default;
   };
-  
+
+
   template <typename V>
   auto json_value(V&& v)
   {

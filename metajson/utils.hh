@@ -37,7 +37,6 @@ namespace iod
       return make_metamap(_name = S{});
     }
 
-
     template <typename V>
     auto to_json_schema(V v)
     {

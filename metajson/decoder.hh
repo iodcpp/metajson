@@ -240,7 +240,11 @@ namespace iod
           }
 
         A[i].parse_value = [m,&obj] (P& p) {
-          if constexpr(decltype(has_key(m, _type)){} and decltype(json_is_value(m.type)){}) {
+          
+          using V = decltype(symbol_member_access(obj, m.name));
+          using VS = decltype(get_or(m, _type, json_value_<V>{}));
+          
+          if constexpr(decltype(json_is_value(VS{})){}) {
             if (auto err = p.fill(symbol_member_access(obj, m.name))) return err;
             else return JSON_OK;
             }
