@@ -23,7 +23,7 @@ int main()
     iod::json_encode(ss, obj);
     assert(ss.str() == input);
   
-    struct { int test1; std::string test2; } obj2{12, "John"};  
+    struct { int test1() { return 12; }; std::string test2; } obj2{"John"};  
     assert(iod::json_object(s::_test1, s::_test2).encode(obj2) == input);
 
     ss.str("");
@@ -31,6 +31,8 @@ int main()
     assert(ss.str() == input);
   }
 
+  
+  
   {
     // Arrays;
     std::string input = R"json({"test1":2,"test2":[{"test1":11,"test2":"Bob"},{"test1":12,"test2":"John"}]})json";

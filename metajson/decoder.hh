@@ -235,21 +235,21 @@ namespace iod
             A[i].name = m.json_key;
           }
 
-        if constexpr(decltype(is_std_optional(symbol_member_access(obj, m.name))){}) {
+        if constexpr(decltype(is_std_optional(symbol_member_or_getter_access(obj, m.name))){}) {
             A[i].required = false;
           }
 
         A[i].parse_value = [m,&obj] (P& p) {
           
-          using V = decltype(symbol_member_access(obj, m.name));
+          using V = decltype(symbol_member_or_getter_access(obj, m.name));
           using VS = decltype(get_or(m, _type, json_value_<V>{}));
           
           if constexpr(decltype(json_is_value(VS{})){}) {
-            if (auto err = p.fill(symbol_member_access(obj, m.name))) return err;
+            if (auto err = p.fill(symbol_member_or_getter_access(obj, m.name))) return err;
             else return JSON_OK;
             }
           else {
-              if (auto err = json_decode2(p, symbol_member_access(obj, m.name), m.type)) return err;
+              if (auto err = json_decode2(p, symbol_member_or_getter_access(obj, m.name), m.type)) return err;
               else return JSON_OK;
           }
         };

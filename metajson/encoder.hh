@@ -116,8 +116,8 @@ namespace iod
       auto encode_one_entity = [&] (auto e)
         {
 
-          if constexpr(decltype(is_std_optional(symbol_member_access(obj, e.name))){}) {
-              if (!symbol_member_access(obj, e.name).has_value()) return;
+          if constexpr(decltype(is_std_optional(symbol_member_or_getter_access(obj, e.name))){}) {
+              if (!symbol_member_or_getter_access(obj, e.name).has_value()) return;
             }
 
           if (!first) { ss << ','; }
@@ -131,13 +131,13 @@ namespace iod
 
           if constexpr(has_key(e, _type)) {
               if constexpr(decltype(json_is_vector(e.type)){} or decltype(json_is_object(e.type)){}) {
-                  return json_encode(ss, symbol_member_access(obj, e.name), e.type);
+                  return json_encode(ss, symbol_member_or_getter_access(obj, e.name), e.type);
                 }
               else
-                json_encode_value(ss, symbol_member_access(obj, e.name));
+                json_encode_value(ss, symbol_member_or_getter_access(obj, e.name));
             }
           else
-            json_encode_value(ss, symbol_member_access(obj, e.name));
+            json_encode_value(ss, symbol_member_or_getter_access(obj, e.name));
         };
 
       tuple_apply_each(encode_one_entity, schema.schema);

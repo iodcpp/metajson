@@ -1,6 +1,6 @@
 #include <iod/metajson/metajson.hh>
 #include <cassert>
-
+#include <iostream>
 namespace s
 {
   IOD_SYMBOL(test1)
@@ -20,25 +20,20 @@ int main()
     assert(obj.test2 == "John");
   }
 
-  { // Double quote escape.
-    std::string input = R"json({"test1":12,"test2":"John\""})json";
+  { // C-struct with getter and members
+    std::string input = R"json({"test1":12,"test2":42})json";
 
-    auto obj = iod::make_metamap(s::_test1 = int(),
-                                 s::_test2 = std::string());
-    
-    iod::json_decode(input, obj);
-    assert(iod::json_encode(obj) == input);
+    struct {
+      int& test1() { return tmp; }
+      int test2;
+    private:
+      int tmp;
+    } a;
 
-  }
-
-  { // Double quote escape.
-    std::string input = R"json({"test1":12,"test2":"John\\\""})json";
-
-    auto obj = iod::make_metamap(s::_test1 = int(),
-                                 s::_test2 = std::string());
-    
-    iod::json_decode(input, obj);
-    assert(iod::json_encode(obj) == input);
+    auto err = iod::json_object(s::_test1, s::_test2).decode(input, a);
+    assert(!err);
+    assert(a.test1() == 12);
+    assert(a.test2 == 42);
   }
 
   { // json key.
