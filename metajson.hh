@@ -7,18 +7,18 @@
 
 #pragma once
 
-#include <variant>
-#include <cstring>
-#include <cmath>
-#include <memory>
-#include <functional>
-#include <utility>
-#include <experimental/tuple>
 #include <experimental/string_view>
-#include <vector>
 #include <cassert>
+#include <cstring>
+#include <memory>
+#include <vector>
+#include <experimental/tuple>
+#include <utility>
 #include <string>
+#include <variant>
 #include <sstream>
+#include <functional>
+#include <cmath>
 
 
 
@@ -311,6 +311,9 @@ template <typename V>                                                   \
   template <typename T>                                                 \
   static constexpr auto has_member(T&& o) -> decltype(o.NAME, std::true_type{}) { return {}; } \
   static constexpr std::false_type has_member(...) { return {}; }              \
+  template <typename T>                                                 \
+  static constexpr auto has_getter(T&& o) -> decltype(o.NAME(), std::true_type{}) { return {}; } \
+  static constexpr std::false_type has_getter(...) { return {}; }              \
                                                                         \
   static inline auto symbol_string()                                    \
   {                                                                     \
@@ -319,7 +322,7 @@ template <typename V>                                                   \
                                                                         \
 };                                                                      \
 static constexpr _##NAME##_t _##NAME;
-
+  
 
 namespace iod
 {
@@ -363,6 +366,32 @@ namespace iod
     return decltype(S::has_member(o)){};
   }
 
+  template <typename T, typename S>
+  constexpr auto has_getter(T&& o, S)
+  {
+    return decltype(S::has_getter(o)){};
+  }
+
+  template <typename S, typename T>
+  struct CANNOT_FIND_REQUESTED_MEMBER_IN_TYPE {};
+  
+  template <typename T, typename S>
+  decltype(auto) symbol_member_or_getter_access(T&&o, S)
+  {
+    if constexpr(has_getter(o, S{})) {
+        return symbol_method_call(o, S{});
+      }
+    else if constexpr(has_member(o, S{}))
+    {
+      return symbol_member_access(o, S{});
+    }
+    else
+    {
+      return CANNOT_FIND_REQUESTED_MEMBER_IN_TYPE<S, T>::error;
+    }
+                   
+  }
+  
   template <typename S>
   auto symbol_string(symbol<S> v)
   {
@@ -1476,21 +1505,21 @@ namespace iod
             A[i].name = m.json_key;
           }
 
-        if constexpr(decltype(is_std_optional(symbol_member_access(obj, m.name))){}) {
+        if constexpr(decltype(is_std_optional(symbol_member_or_getter_access(obj, m.name))){}) {
             A[i].required = false;
           }
 
         A[i].parse_value = [m,&obj] (P& p) {
           
-          using V = decltype(symbol_member_access(obj, m.name));
+          using V = decltype(symbol_member_or_getter_access(obj, m.name));
           using VS = decltype(get_or(m, _type, json_value_<V>{}));
           
           if constexpr(decltype(json_is_value(VS{})){}) {
-            if (auto err = p.fill(symbol_member_access(obj, m.name))) return err;
+            if (auto err = p.fill(symbol_member_or_getter_access(obj, m.name))) return err;
             else return JSON_OK;
             }
           else {
-              if (auto err = json_decode2(p, symbol_member_access(obj, m.name), m.type)) return err;
+              if (auto err = json_decode2(p, symbol_member_or_getter_access(obj, m.name), m.type)) return err;
               else return JSON_OK;
           }
         };
@@ -1670,8 +1699,8 @@ namespace iod
       auto encode_one_entity = [&] (auto e)
         {
 
-          if constexpr(decltype(is_std_optional(symbol_member_access(obj, e.name))){}) {
-              if (!symbol_member_access(obj, e.name).has_value()) return;
+          if constexpr(decltype(is_std_optional(symbol_member_or_getter_access(obj, e.name))){}) {
+              if (!symbol_member_or_getter_access(obj, e.name).has_value()) return;
             }
 
           if (!first) { ss << ','; }
@@ -1685,13 +1714,13 @@ namespace iod
 
           if constexpr(has_key(e, _type)) {
               if constexpr(decltype(json_is_vector(e.type)){} or decltype(json_is_object(e.type)){}) {
-                  return json_encode(ss, symbol_member_access(obj, e.name), e.type);
+                  return json_encode(ss, symbol_member_or_getter_access(obj, e.name), e.type);
                 }
               else
-                json_encode_value(ss, symbol_member_access(obj, e.name));
+                json_encode_value(ss, symbol_member_or_getter_access(obj, e.name));
             }
           else
-            json_encode_value(ss, symbol_member_access(obj, e.name));
+            json_encode_value(ss, symbol_member_or_getter_access(obj, e.name));
         };
 
       tuple_apply_each(encode_one_entity, schema.schema);
