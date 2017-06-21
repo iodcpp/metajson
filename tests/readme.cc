@@ -1,70 +1,6 @@
-iod::metajson
-============================
-
-iod::metajson is a C++17 JSON serializer/deserializer designed for
-ease of use and performances.
-
-It handle a subset of other JSON serialization libraries: **Only cases
-where the structure of the object is known at compile time are covered**.
-It these specific cases, metajson is faster and produce smaller binaries.
-
-**Features:**
-  - Non intrusive
-  - Header only
-  - UTF-8 support
-  - Exception free
-  - Small codebase: 1200 LOC
-  - Portable: No architecture specific code.
-
-**Limitations:**
-  - metajson only handles JSON objects with a **static structure known at compile time**.
-  - iod::metajson properly handle decoding and encoding UTF-8 but not the others UTF-{32|16} {big|little} endian encodings.
-  - No explicit errors for ill-formatted json messsages.
-
-**Performances:** Up to **9x** faster than nlohmann/json and **2x**
-  faster than rapidjson*. I did not find usecases where metajson was
-  not the fastest. If you find some, please report.
-
-**Binary code size:** Up to **8x** smaller than nlohmann/json and **2x** smaller than rapidjson*.
-
-[1] https://github.com/miloyip/rapidjson
-
-[2] https://github.com/nlohmann/json
-
-[3] https://github.com/AlDanial/cloc
-
-\* Theses numbers are not given by an comprehensive benchmark. They just give a rough idea
-of metajson performances and does not take into account the fact that other libraries provides
-more features.
-
-Author
-============================
-
-Matthieu Garrigues https://github.com/matt-42
-
-
-Installation
-============================
-
-```
-wget https://raw.githubusercontent.com/iodcpp/metajson/master/metajson.hh
-```
-
-```c++
-#include "metajson.hh"
-```
-
-Compilers
-============================
-
-- GCC 7.1.1: OK
-- Clang 4: Failing (https://stackoverflow.com/questions/44262236/clang-4-build-error-on-functional-with-c1z)
-
-Overview
-============================
-
-```c++
-#include "metajson.hh"
+#include <iod/metajson/metajson.hh>
+#include <iostream>
+#include <string>
 
 namespace s
 {
@@ -152,5 +88,3 @@ int main ()
   // {"age":12,"last_name":"John"}
 
 }
-
-```

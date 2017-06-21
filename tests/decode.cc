@@ -1,6 +1,6 @@
 #include <iod/metajson/metajson.hh>
 #include <cassert>
-#include <iostream>
+
 namespace s
 {
   IOD_SYMBOL(test1)

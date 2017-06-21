@@ -15,6 +15,8 @@ add_test(json_encode json_encode)
 add_executable(json_unicode tests/unicode.cc)
 add_test(json_unicode json_unicode)
 
+add_executable(readme tests/readme.cc)
+
 add_executable(number_parser tests/number_parser.cc)
 add_test(number_parser number_parser)
 
