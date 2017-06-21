@@ -104,7 +104,7 @@ int main ()
 
   // Serialize getters as well as members.
   struct { int age; std::string name() { return "Bob"; } } gm;
-  json_str = json_object(s::_age, s::_name).encode(obj);
+  json_str = json_object(s::_age, s::_name).encode(gm);
   // {"age":12,"name":"Bob"}
   
   // std::tuple
