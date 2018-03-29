@@ -58,7 +58,7 @@ Compilers
 ============================
 
 - GCC 7.1.1: OK
-- Clang 4: Failing (https://stackoverflow.com/questions/44262236/clang-4-build-error-on-functional-with-c1z)
+- Clang 5.0.1: OK
 
 Overview
 ============================
@@ -101,7 +101,7 @@ int main ()
 
   // Serialize getters as well as members.
   struct { int age; std::string name() { return "Bob"; } } gm;
-  json_str = json_object(s::age, s::name).encode(obj);
+  json_str = json_object(s::age, s::name).encode(gm);
   // {"age":12,"name":"Bob"}
   
   // std::tuple
