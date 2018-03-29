@@ -231,7 +231,7 @@ namespace iod
         A[i].name = symbol_string(m.name);
         A[i].name_len = strlen(symbol_string(m.name));
 
-        if constexpr(has_key(m, _json_key)) {
+        if constexpr(has_key(m, s::json_key)) {
             A[i].name = m.json_key;
           }
 
@@ -242,7 +242,7 @@ namespace iod
         A[i].parse_value = [m,&obj] (P& p) {
           
           using V = decltype(symbol_member_or_getter_access(obj, m.name));
-          using VS = decltype(get_or(m, _type, json_value_<V>{}));
+          using VS = decltype(get_or(m, s::type, json_value_<V>{}));
           
           if constexpr(decltype(json_is_value(VS{})){}) {
             if (auto err = p.fill(symbol_member_or_getter_access(obj, m.name))) return err;

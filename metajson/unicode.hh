@@ -16,17 +16,17 @@ namespace iod
   template <typename O>
   inline decltype(auto) wrap_json_output_stream(O&& s)
   {
-    return make_metamap(_append = [&s] (char c) { s << c; });
+    return make_metamap(s::append = [&s] (char c) { s << c; });
   }
   
   inline decltype(auto) wrap_json_output_stream(std::stringstream& s)
   {
-    return make_metamap(_append = [&s] (char c) { s << c; });
+    return make_metamap(s::append = [&s] (char c) { s << c; });
   }
 
   inline decltype(auto) wrap_json_output_stream(std::string& s)
   {
-    return make_metamap(_append = [&s] (char c) { s.append(1, c); });
+    return make_metamap(s::append = [&s] (char c) { s.append(1, c); });
   }
 
   inline decltype(auto)

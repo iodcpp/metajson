@@ -16,15 +16,12 @@
 #include <rapidjson/document.h>
 #include "nlohmann_json.hpp"
 
-namespace s
-{
-  IOD_SYMBOL(type);
-  IOD_SYMBOL(coordinates);
-  IOD_SYMBOL(features);
-  IOD_SYMBOL(properties);
-  IOD_SYMBOL(geometry);
-  IOD_SYMBOL(name);
-}
+IOD_SYMBOL(type);
+IOD_SYMBOL(coordinates);
+IOD_SYMBOL(features);
+IOD_SYMBOL(properties);
+IOD_SYMBOL(geometry);
+IOD_SYMBOL(name);
 
 using namespace iod;
 
@@ -42,13 +39,13 @@ void load_file()
 static void metajson(benchmark::State& state) {
 
   load_file();
-  auto json_geometry = make_metamap(s::_type = std::string(),
-                                    s::_coordinates = std::vector<std::vector<std::vector<float>>>());
+  auto json_geometry = make_metamap(s::type = std::string(),
+                                    s::coordinates = std::vector<std::vector<std::vector<float>>>());
 
-  auto json_canada = make_metamap(s::_type = std::string(),
-                                  s::_features = { make_metamap(s::_type = std::string(),
-                                                                s::_properties = make_metamap(_name = std::string()),
-                                                                s::_geometry = json_geometry)} );
+  auto json_canada = make_metamap(s::type = std::string(),
+                                  s::features = { make_metamap(s::type = std::string(),
+                                                               s::properties = make_metamap(_name = std::string()),
+                                                               s::geometry = json_geometry)} );
 
   while (state.KeepRunning())
   {
@@ -60,13 +57,13 @@ static void bench_rapidjson(benchmark::State& state) {
   
   load_file();
 
-  auto json_geometry = make_metamap(s::_type = std::string(),
-                                    s::_coordinates = std::vector<std::vector<std::vector<float>>>());
+  auto json_geometry = make_metamap(s::type = std::string(),
+                                    s::coordinates = std::vector<std::vector<std::vector<float>>>());
 
-  auto json_canada = make_metamap(s::_type = std::string(),
-                                  s::_features = { make_metamap(s::_type = std::string(),
-                                                                s::_properties = make_metamap(_name = std::string()),
-                                                                s::_geometry = json_geometry)} );
+  auto json_canada = make_metamap(s::type = std::string(),
+                                  s::features = { make_metamap(s::type = std::string(),
+                                                               s::properties = make_metamap(_name = std::string()),
+                                                               s::geometry = json_geometry)} );
   
   auto obj = std::vector<std::vector<std::vector<float>>>();
   int cpt = 0;

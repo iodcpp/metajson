@@ -1,19 +1,16 @@
 #include <iod/metajson/metajson.hh>
 #include <cassert>
 
-namespace s
-{
-  IOD_SYMBOL(test1)
-  IOD_SYMBOL(test2)
-}
+IOD_SYMBOL(test1)
+IOD_SYMBOL(test2)
 
 int main()
 {
   { // Simple deserializer.
     std::string input = R"json({"test1":12,"test2":"John"})json";
 
-    auto obj = iod::make_metamap(s::_test1 = int(),
-                                 s::_test2 = std::string());
+    auto obj = iod::make_metamap(s::test1 = int(),
+                                 s::test2 = std::string());
 
     iod::json_decode(input, obj);
     assert(obj.test1 == 12);
@@ -30,7 +27,7 @@ int main()
       int tmp;
     } a;
 
-    auto err = iod::json_object(s::_test1, s::_test2).decode(input, a);
+    auto err = iod::json_object(s::test1, s::test2).decode(input, a);
     assert(!err);
     assert(a.test1() == 12);
     assert(a.test2 == 42);
@@ -39,10 +36,10 @@ int main()
   { // json key.
     std::string input = R"json({"test1":12,"name":"John"})json";
 
-    auto obj = iod::make_metamap(s::_test1 = int(),
-                                 s::_test2 = std::string());
+    auto obj = iod::make_metamap(s::test1 = int(),
+                                 s::test2 = std::string());
 
-    json_object(s::_test1, s::_test2(iod::json_key("name"))).decode(input, obj);
+    json_object(s::test1, s::test2(iod::json_key("name"))).decode(input, obj);
 
     assert(obj.test1 == 12);
     assert(obj.test2 == "John");
@@ -69,7 +66,7 @@ int main()
     struct A { int test1; };
 
     std::vector<A> v;
-    auto err = iod::json_vector(s::_test1).decode(input, v);
+    auto err = iod::json_vector(s::test1).decode(input, v);
     assert(!err);
     assert(v.size() == 1);
     assert(v[0].test1 == 12);
@@ -90,7 +87,7 @@ int main()
 
   {
     // optional.
-    auto obj = iod::make_metamap(s::_test1 = std::optional<std::string>());
+    auto obj = iod::make_metamap(s::test1 = std::optional<std::string>());
     auto err = iod::json_decode("{}", obj);
     assert(err.good());
     assert(!obj.test1.has_value());
@@ -103,7 +100,7 @@ int main()
 
   {
     // Variant.
-    auto obj = iod::make_metamap(s::_test1 = std::variant<int, std::string>("abc"));
+    auto obj = iod::make_metamap(s::test1 = std::variant<int, std::string>("abc"));
 
     assert(iod::json_decode(R"json({"test1":{"idx":1,"value":"abc"}})json", obj).good());
     assert(std::get<std::string>(obj.test1) == "abc");

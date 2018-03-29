@@ -67,6 +67,8 @@ namespace iod
 
       if (e < 18)
         return pows[e];
+      else
+        return 0;
     }
     
     template <typename F>

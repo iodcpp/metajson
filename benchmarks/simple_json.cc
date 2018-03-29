@@ -23,18 +23,15 @@ const char* json_str = R"json({"test1":12,"test2":1223,"test3": "hello world"})j
 
 using namespace iod;
 
-namespace s
-{
-  IOD_SYMBOL(test1);
-  IOD_SYMBOL(test2);
-  IOD_SYMBOL(test3);
-}
+IOD_SYMBOL(test1);
+IOD_SYMBOL(test2);
+IOD_SYMBOL(test3);
 
 static void iod_custom_stream(benchmark::State& state) {
 
   long i = 0;
   //std::stringstream ss = std::stringstream(std::string(json_str));
-  auto obj = make_metamap(s::_test1 = 0, s::_test2 = 0, s::_test3 = std::string());
+  auto obj = make_metamap(s::test1 = 0, s::test2 = 0, s::test3 = std::string());
   while (state.KeepRunning())
   {
     decode_stringstream ss(json_str);
@@ -47,7 +44,7 @@ static void bench_rapidjson(benchmark::State& state) {
 
   long i = 0;
   //std::stringstream ss = std::stringstream(std::string(json_str));
-  auto obj = make_metamap(s::_test1 = 0, s::_test2 = 0, s::_test3 = std::string());
+  auto obj = make_metamap(s::test1 = 0, s::test2 = 0, s::test3 = std::string());
   while (state.KeepRunning())
   {
     rapidjson::Document d;
@@ -63,7 +60,7 @@ static void bench_nlohmann_json(benchmark::State& state) {
 
   long i = 0;
   //std::stringstream ss = std::stringstream(std::string(json_str));
-  auto obj = make_metamap(s::_test1 = 0, s::_test2 = 0, s::_test3 = std::string());
+  auto obj = make_metamap(s::test1 = 0, s::test2 = 0, s::test3 = std::string());
   while (state.KeepRunning())
   {
     auto d = nlohmann::json::parse(json_str);

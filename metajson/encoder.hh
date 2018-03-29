@@ -122,14 +122,14 @@ namespace iod
 
           if (!first) { ss << ','; }
           first = false; 
-          if constexpr(has_key(e, _json_key)) {
+          if constexpr(has_key(e, s::json_key)) {
               json_encode_value(ss, e.json_key);
             }
           else
             json_encode_value(ss, symbol_string(e.name));
           ss << ':';
 
-          if constexpr(has_key(e, _type)) {
+          if constexpr(has_key(e, s::type)) {
               if constexpr(decltype(json_is_vector(e.type)){} or decltype(json_is_object(e.type)){}) {
                   return json_encode(ss, symbol_member_or_getter_access(obj, e.name), e.type);
                 }

@@ -1,11 +1,8 @@
 #include <cassert>
 #include <iod/metajson/metajson.hh>
 
-namespace s
-{
-  IOD_SYMBOL(test1)
-  IOD_SYMBOL(test2)
-}
+IOD_SYMBOL(test1)
+IOD_SYMBOL(test2)
 
 int main()
 {
@@ -13,8 +10,8 @@ int main()
   {
     std::string input = R"json({"test1":12,"test2":"John"})json";
 
-    auto obj = iod::make_metamap(s::_test1 = 12,
-                                 s::_test2 = iod::string_view("John"));
+    auto obj = iod::make_metamap(s::test1 = 12,
+                                 s::test2 = iod::string_view("John"));
   
     auto enc = iod::json_encode(obj);
     assert(enc == input);
@@ -24,10 +21,10 @@ int main()
     assert(ss.str() == input);
   
     struct { int test1() { return 12; }; std::string test2; } obj2{"John"};  
-    assert(iod::json_object(s::_test1, s::_test2).encode(obj2) == input);
+    assert(iod::json_object(s::test1, s::test2).encode(obj2) == input);
 
     ss.str("");
-    iod::json_object(s::_test1, s::_test2).encode(ss, obj2);
+    iod::json_object(s::test1, s::test2).encode(ss, obj2);
     assert(ss.str() == input);
   }
 
@@ -40,27 +37,27 @@ int main()
     struct A { int test1; std::string test2; };
     struct { int test1; std::vector<A> test2; } obj{2, { {11, "Bob"}, {12, "John"} }};
 
-    assert(json_object(s::_test1, s::_test2 = json_vector(s::_test1, s::_test2)).encode(obj) == input);
+    assert(json_object(s::test1, s::test2 = json_vector(s::test1, s::test2)).encode(obj) == input);
   }
 
   {
     // json_key
     std::string input = R"json({"test1":12,"name":"John"})json";
 
-    auto obj = iod::make_metamap(s::_test1 = 12,
-                                 s::_test2 = iod::string_view("John"));
+    auto obj = iod::make_metamap(s::test1 = 12,
+                                 s::test2 = iod::string_view("John"));
   
-    assert(input == iod::json_object(s::_test1, s::_test2(iod::json_key("name"))).encode(obj));
+    assert(input == iod::json_object(s::test1, s::test2(iod::json_key("name"))).encode(obj));
   }
 
   {
     // Nested array
     std::string input = R"json([{"test1":["test1":12]}])json";
 
-    using s::_test1;
-    typedef decltype(iod::make_metamap(_test1 = std::vector<decltype(iod::make_metamap(_test1 = int()))>())) elt;
+    using s::test1;
+    typedef decltype(iod::make_metamap(s::test1 = std::vector<decltype(iod::make_metamap(s::test1 = int()))>())) elt;
     auto obj = std::vector<elt>();
-    obj.push_back(iod::make_metamap(_test1 = { iod::make_metamap(_test1 = 12) }));
+    obj.push_back(iod::make_metamap(s::test1 = { iod::make_metamap(s::test1 = 12) }));
   }
 
   {
@@ -86,7 +83,7 @@ int main()
     std::string input = R"json(["Alice",{"test1":11,"test2":"Bob"}])json";
 
     struct A { int test1; std::string test2; };
-    auto A_json = json_object(s::_test1, s::_test2);
+    auto A_json = json_object(s::test1, s::test2);
     auto tu = std::make_tuple("Alice", A{11, "Bob"});
     assert(iod::json_tuple(std::string(), A_json).encode(tu) == input);
   }
@@ -94,10 +91,10 @@ int main()
   {
     // Optionals.
     struct { std::optional<std::string> test2; } x;
-    assert(iod::json_object(s::_test2).encode(x) == "{}");
+    assert(iod::json_object(s::test2).encode(x) == "{}");
 
     x.test2 = "he";
-    assert(iod::json_object(s::_test2).encode(x) == R"json({"test2":"he"})json");
+    assert(iod::json_object(s::test2).encode(x) == R"json({"test2":"he"})json");
     
   }
 
