@@ -206,6 +206,7 @@ namespace iod
         first = false;
         if ((err = json_decode2(p, value, value_schema))) return err;
         p.eat_spaces();
+        return JSON_OK;
       };
       
       json_decode_tuple_elements(decode_one_element, tu, schema.elements, std::make_index_sequence<sizeof...(O)>{});
