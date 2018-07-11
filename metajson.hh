@@ -7,18 +7,18 @@
 
 #pragma once
 
-#include <experimental/string_view>
-#include <cassert>
 #include <cstring>
-#include <memory>
-#include <vector>
+#include <experimental/string_view>
+#include <variant>
+#include <string>
+#include <cmath>
 #include <experimental/tuple>
 #include <utility>
-#include <string>
-#include <variant>
-#include <sstream>
+#include <memory>
 #include <functional>
-#include <cmath>
+#include <vector>
+#include <sstream>
+#include <cassert>
 
 
 
@@ -289,17 +289,18 @@ namespace iod
 }
 
 #define IOD_SYMBOL(NAME)                                                \
-struct _##NAME##_t : iod::symbol<_##NAME##_t> {                         \
+namespace s {                                                           \
+struct NAME##_t : iod::symbol<NAME##_t> {                         \
                                                                         \
-using assignable<_##NAME##_t>::operator=;                               \
+using assignable<NAME##_t>::operator=;                               \
                                                                         \
-inline constexpr bool operator==(_##NAME##_t) { return true; }          \
+inline constexpr bool operator==(NAME##_t) { return true; }          \
   template <typename T>                                                 \
   inline constexpr bool operator==(T) { return false; }                 \
                                                                         \
 template <typename V>                                                   \
   struct variable_t {                                                   \
-    typedef _##NAME##_t _iod_symbol_type;                            \
+    typedef NAME##_t _iod_symbol_type;                            \
     typedef V _iod_value_type;                                          \
     V NAME;                                                             \
   };                                                                   \
@@ -308,12 +309,14 @@ template <typename V>                                                   \
   static inline decltype(auto) symbol_method_call(T&& o, A... args) { return o.NAME(args...); } \
   template <typename T, typename... A>                                  \
   static inline auto& symbol_member_access(T&& o) { return o.NAME; } \
-  template <typename T>                                                 \
-  static constexpr auto has_member(T&& o) -> decltype(o.NAME, std::true_type{}) { return {}; } \
-  static constexpr std::false_type has_member(...) { return {}; }              \
-  template <typename T>                                                 \
-  static constexpr auto has_getter(T&& o) -> decltype(o.NAME(), std::true_type{}) { return {}; } \
-  static constexpr std::false_type has_getter(...) { return {}; }              \
+  template <typename T>                                                \
+  static constexpr auto has_getter(int) -> decltype(std::declval<T>().NAME(), std::true_type{}) { return {}; } \
+  template <typename T>                                                \
+  static constexpr auto has_getter(long) { return std::false_type{}; }     \
+  template <typename T>                                                \
+  static constexpr auto has_member(int) -> decltype(std::declval<T>().NAME, std::true_type{}) { return {}; } \
+  template <typename T>                                                \
+  static constexpr auto has_member(long) { return std::false_type{}; }        \
                                                                         \
   static inline auto symbol_string()                                    \
   {                                                                     \
@@ -321,8 +324,9 @@ template <typename V>                                                   \
   }                                                                     \
                                                                         \
 };                                                                      \
-static constexpr _##NAME##_t _##NAME;
-  
+static constexpr  NAME##_t NAME;                                    \
+}
+
 
 namespace iod
 {
@@ -361,30 +365,27 @@ namespace iod
   }
   
   template <typename T, typename S>
-  constexpr auto has_member(T&& o, S)
-  {
-    return decltype(S::has_member(o)){};
-  }
+  constexpr auto has_member(T&& o, S) { return S::template has_member<T>(0); }
+  template <typename T, typename S>
+  constexpr auto has_member() { return S::template has_member<T>(0); }
 
   template <typename T, typename S>
-  constexpr auto has_getter(T&& o, S)
-  {
-    return decltype(S::has_getter(o)){};
-  }
-
+  constexpr auto has_getter(T&& o, S) { return decltype(S::template has_getter<T>(0)){}; }
+  template <typename T, typename S>
+  constexpr auto has_getter() { return decltype(S::template has_getter<T>(0)){}; }
+  
   template <typename S, typename T>
   struct CANNOT_FIND_REQUESTED_MEMBER_IN_TYPE {};
   
   template <typename T, typename S>
   decltype(auto) symbol_member_or_getter_access(T&&o, S)
   {
-    if constexpr(has_getter(o, S{})) {
+    if constexpr(has_getter<T, S>()) {
         return symbol_method_call(o, S{});
       }
-    else if constexpr(has_member(o, S{}))
-    {
-      return symbol_member_access(o, S{});
-    }
+    else if constexpr(has_member<T, S>()) {
+        return symbol_member_access(o, S{});
+      }
     else
     {
       return CANNOT_FIND_REQUESTED_MEMBER_IN_TYPE<S, T>::error;
@@ -613,13 +614,13 @@ namespace iod
     auto make_json_object_member(const assign_exp<S, T>& e)
     {
       return cat(make_json_object_member(e.left),
-                 make_metamap(_type = e.right));
+                 make_metamap(s::type = e.right));
     }
 
     template <typename S>
     auto make_json_object_member(const symbol<S>&)
     {
-      return make_metamap(_name = S{});
+      return make_metamap(s::name = S{});
     }
 
     template <typename V>
@@ -650,7 +651,7 @@ namespace iod
       auto tuple_maker = [] (auto&&... t) { return std::make_tuple(std::forward<decltype(t)>(t)...); };
 
       auto entities = map_reduce(m, [] (auto k, auto v) {
-          return make_metamap(_name = k, _type = to_json_schema(v));
+          return make_metamap(s::name = k, s::type = to_json_schema(v));
         }, tuple_maker);
 
 
@@ -673,7 +674,7 @@ namespace iod
     template <typename S, typename... A>
     auto make_json_object_member(const function_call_exp<S, A...>& e)
     {
-      auto res = make_metamap(_name = e.method, _json_key = symbol_string(e.method));
+      auto res = make_metamap(s::name = e.method, s::json_key = symbol_string(e.method));
 
       auto parse = [&] (auto a)
         {
@@ -783,6 +784,8 @@ namespace iod
 
       if (e < 18)
         return pows[e];
+      else
+        return 0;
     }
     
     template <typename F>
@@ -956,17 +959,17 @@ namespace iod
   template <typename O>
   inline decltype(auto) wrap_json_output_stream(O&& s)
   {
-    return make_metamap(_append = [&s] (char c) { s << c; });
+    return make_metamap(s::append = [&s] (char c) { s << c; });
   }
   
   inline decltype(auto) wrap_json_output_stream(std::stringstream& s)
   {
-    return make_metamap(_append = [&s] (char c) { s << c; });
+    return make_metamap(s::append = [&s] (char c) { s << c; });
   }
 
   inline decltype(auto) wrap_json_output_stream(std::string& s)
   {
-    return make_metamap(_append = [&s] (char c) { s.append(1, c); });
+    return make_metamap(s::append = [&s] (char c) { s.append(1, c); });
   }
 
   inline decltype(auto)
@@ -1476,6 +1479,7 @@ namespace iod
         first = false;
         if ((err = json_decode2(p, value, value_schema))) return err;
         p.eat_spaces();
+        return JSON_OK;
       };
       
       json_decode_tuple_elements(decode_one_element, tu, schema.elements, std::make_index_sequence<sizeof...(O)>{});
@@ -1501,7 +1505,7 @@ namespace iod
         A[i].name = symbol_string(m.name);
         A[i].name_len = strlen(symbol_string(m.name));
 
-        if constexpr(has_key(m, _json_key)) {
+        if constexpr(has_key(m, s::json_key)) {
             A[i].name = m.json_key;
           }
 
@@ -1512,7 +1516,7 @@ namespace iod
         A[i].parse_value = [m,&obj] (P& p) {
           
           using V = decltype(symbol_member_or_getter_access(obj, m.name));
-          using VS = decltype(get_or(m, _type, json_value_<V>{}));
+          using VS = decltype(get_or(m, s::type, json_value_<V>{}));
           
           if constexpr(decltype(json_is_value(VS{})){}) {
             if (auto err = p.fill(symbol_member_or_getter_access(obj, m.name))) return err;
@@ -1705,14 +1709,14 @@ namespace iod
 
           if (!first) { ss << ','; }
           first = false; 
-          if constexpr(has_key(e, _json_key)) {
+          if constexpr(has_key(e, s::json_key)) {
               json_encode_value(ss, e.json_key);
             }
           else
             json_encode_value(ss, symbol_string(e.name));
           ss << ':';
 
-          if constexpr(has_key(e, _type)) {
+          if constexpr(has_key(e, s::type)) {
               if constexpr(decltype(json_is_vector(e.type)){} or decltype(json_is_object(e.type)){}) {
                   return json_encode(ss, symbol_member_or_getter_access(obj, e.name), e.type);
                 }
