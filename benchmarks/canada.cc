@@ -49,7 +49,7 @@ static void metajson(benchmark::State& state) {
 
   while (state.KeepRunning())
   {
-    iod::json_decode(json_str, json_canada);
+    iod::metajson::json_decode(json_str, json_canada);
   }
 }
 

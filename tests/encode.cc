@@ -1,8 +1,12 @@
 #include <cassert>
+#include <string_view>
 #include <iod/metajson/metajson.hh>
 
 IOD_SYMBOL(test1)
 IOD_SYMBOL(test2)
+
+using namespace iod::metamap;
+using namespace iod::metajson;
 
 int main()
 {
@@ -10,21 +14,21 @@ int main()
   {
     std::string input = R"json({"test1":12,"test2":"John"})json";
 
-    auto obj = iod::make_metamap(s::test1 = 12,
-                                 s::test2 = iod::string_view("John"));
+    auto obj = make_metamap(s::test1 = 12,
+                                 s::test2 = std::string_view("John"));
   
-    auto enc = iod::json_encode(obj);
+    auto enc = json_encode(obj);
     assert(enc == input);
 
     std::stringstream ss;
-    iod::json_encode(ss, obj);
+    json_encode(ss, obj);
     assert(ss.str() == input);
   
     struct { int test1() { return 12; }; std::string test2; } obj2{"John"};  
-    assert(iod::json_object(s::test1, s::test2).encode(obj2) == input);
+    assert(json_object(s::test1, s::test2).encode(obj2) == input);
 
     ss.str("");
-    iod::json_object(s::test1, s::test2).encode(ss, obj2);
+    json_object(s::test1, s::test2).encode(ss, obj2);
     assert(ss.str() == input);
   }
 
@@ -44,10 +48,10 @@ int main()
     // json_key
     std::string input = R"json({"test1":12,"name":"John"})json";
 
-    auto obj = iod::make_metamap(s::test1 = 12,
-                                 s::test2 = iod::string_view("John"));
+    auto obj = iod::metamap::make_metamap(s::test1 = 12,
+                                 s::test2 = std::string_view("John"));
   
-    assert(input == iod::json_object(s::test1, s::test2(iod::json_key("name"))).encode(obj));
+    assert(input == iod::metajson::json_object(s::test1, s::test2(iod::metajson::json_key("name"))).encode(obj));
   }
 
   {
@@ -55,27 +59,27 @@ int main()
     std::string input = R"json([{"test1":["test1":12]}])json";
 
     using s::test1;
-    typedef decltype(iod::make_metamap(s::test1 = std::vector<decltype(iod::make_metamap(s::test1 = int()))>())) elt;
+    typedef decltype(iod::metamap::make_metamap(s::test1 = std::vector<decltype(iod::metamap::make_metamap(s::test1 = int()))>())) elt;
     auto obj = std::vector<elt>();
-    obj.push_back(iod::make_metamap(s::test1 = { iod::make_metamap(s::test1 = 12) }));
+    obj.push_back(iod::metamap::make_metamap(s::test1 = { iod::metamap::make_metamap(s::test1 = 12) }));
   }
 
   {
     // plain vectors.
     std::string input = R"json([1,2,3,4])json";
-    assert(iod::json_encode(std::vector<int>{1,2,3,4}) == input);
+    assert(json_encode(std::vector<int>{1,2,3,4}) == input);
   }
   
   {
     // tuples.
     std::string input = R"json([42,"foo",0])json";
-    assert(iod::json_encode(std::make_tuple(42,"foo",0)) == input);
+    assert(json_encode(std::make_tuple(42,"foo",0)) == input);
   }
 
   {
     // nested tuples.
     std::string input = R"json([42,"foo",0,[32,"Bob"]])json";
-    assert(iod::json_encode(std::make_tuple(42,"foo",0, std::make_tuple(32,"Bob"))) == input);
+    assert(json_encode(std::make_tuple(42,"foo",0, std::make_tuple(32,"Bob"))) == input);
   }
 
   {
@@ -85,26 +89,26 @@ int main()
     struct A { int test1; std::string test2; };
     auto A_json = json_object(s::test1, s::test2);
     auto tu = std::make_tuple("Alice", A{11, "Bob"});
-    assert(iod::json_tuple(std::string(), A_json).encode(tu) == input);
+    assert(json_tuple(std::string(), A_json).encode(tu) == input);
   }
 
   {
     // Optionals.
     struct { std::optional<std::string> test2; } x;
-    assert(iod::json_object(s::test2).encode(x) == "{}");
+    assert(json_object(s::test2).encode(x) == "{}");
 
     x.test2 = "he";
-    assert(iod::json_object(s::test2).encode(x) == R"json({"test2":"he"})json");
+    assert(json_object(s::test2).encode(x) == R"json({"test2":"he"})json");
     
   }
 
   {
     // Simple values.
-    assert(iod::json_encode(12) == "12");
-    assert(iod::json_encode("12") == "\"12\"");
-    assert(iod::json_encode(std::optional<int>{}) == "");
-    assert(iod::json_encode(std::optional<int>{12}) == "12");
-    assert(iod::json_encode(std::variant<int,std::string>{"abc"}) == R"json({"idx":1,"value":"abc"})json");
-    assert(iod::json_encode(std::variant<int,std::string>{42}) == R"json({"idx":0,"value":42})json");
+    assert(json_encode(12) == "12");
+    assert(json_encode("12") == "\"12\"");
+    assert(json_encode(std::optional<int>{}) == "");
+    assert(json_encode(std::optional<int>{12}) == "12");
+    assert(json_encode(std::variant<int,std::string>{"abc"}) == R"json({"idx":1,"value":"abc"})json");
+    assert(json_encode(std::variant<int,std::string>{42}) == R"json({"idx":0,"value":42})json");
   }
 }

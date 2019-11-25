@@ -1,16 +1,18 @@
-#include <iod/metajson/metajson.hh>
+#include "metajson.hh"
 #include <iostream>
-#include <string>
 
+IOD_SYMBOL(name)
 IOD_SYMBOL(age)
 IOD_SYMBOL(entry)
 IOD_SYMBOL(id)
 
-using namespace iod::metamap;
-using namespace iod::metajson;
-
 int main ()
 {
+  using iod::metajson::json_encode;
+  using iod::metajson::json_decode;
+
+  using iod::json_object;
+  using iod::json_vector;
   
   std::string json_str;
 
@@ -32,26 +34,6 @@ int main ()
   std::cout << json_str << std::endl;
   // [1,2,3,4]
 
-  // Serialize getters as well as members.
-  struct { int age; std::string name() { return "Bob"; } } gm;
-  json_str = json_object(s::age, s::name).encode(obj);
-  // {"age":12,"name":"Bob"}
-  
-  // std::tuple
-  json_str = json_encode(std::make_tuple(1, "Bob", 3.4));
-  std::cout << json_str << std::endl;
-  // [1, "Bob", 3.4]
-
-  // std::optional
-  std::optional<std::string> my_optional_str;
-  json_encode(my_optional_str); // empty string.
-  my_optional_str = "lol";
-  json_encode(my_optional_str); // "lol"
-
-  // std::variant
-  iod::metajson::json_encode(std::variant<int,std::string>{"abc"});
-  // {"idx":1,"value":"abc"}
-  
   // Arrays of structs
   std::vector<A> array{ {12, "John"},  {2, "Alice"},  {32, "Bob"} };
   json_str = json_vector(s::age, s::name).encode(array);
@@ -66,6 +48,7 @@ int main ()
 
   std::cout << json_str << std::endl;
   // {"id":1,"entry":{"age":12,"name":"John"}}
+
 
   // Metamap
   using iod::metamap::make_metamap;

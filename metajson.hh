@@ -8,7 +8,7 @@
 #pragma once
 
 #include <cstring>
-#include <experimental/string_view>
+#include <string_view>
 #include <variant>
 #include <string>
 #include <cmath>
@@ -583,14 +583,6 @@ namespace iod
 
 }
 
-
-namespace iod
-{
-  IOD_SYMBOL(name)
-  IOD_SYMBOL(type)
-  IOD_SYMBOL(json_key)
-}
-
 namespace iod
 {
 
@@ -722,7 +714,7 @@ namespace iod
 
 namespace iod
 {
-  using std::experimental::string_view;
+  using std::string_view;
   
   namespace internal
   {
@@ -981,7 +973,7 @@ namespace iod
   inline decltype(auto)
   wrap_json_input_stream(const char* s) { return std::stringstream(std::string(s)); }
   inline decltype(auto)
-  wrap_json_input_stream(const std::experimental::string_view& s) { return std::stringstream(std::string(s)); }
+  wrap_json_input_stream(const std::string_view& s) { return std::stringstream(std::string(s)); }
 
   namespace unicode_impl
   {
@@ -1358,7 +1350,7 @@ namespace iod
 
         if constexpr(std::is_floating_point<T>::value or
                      std::is_integral<T>::value or
-                     std::is_same<T, iod::string_view>::value
+                     std::is_same<T, std::string_view>::value
           ) {
             ss >> t;
             if (ss.bad())
@@ -1598,7 +1590,7 @@ namespace iod
 
 namespace iod
 {
-  using std::experimental::string_view;
+  using std::string_view;
 
   template <typename... T>
   struct json_tuple_;

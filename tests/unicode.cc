@@ -5,6 +5,9 @@
 
 #include <iod/metajson/unicode.hh>
 
+using namespace iod::metamap;
+using namespace iod::metajson;
+
 struct R
 {
   void append(uint8_t c)
@@ -38,7 +41,7 @@ void test_ascii(uint16_t c)
     stream << std::string(1, c);
 
     // c should convert to "c"
-    auto err = iod::utf8_to_json(stream, out);
+    auto err = utf8_to_json(stream, out);
     assert(err == 0);
     assert(out == ref.s);
 
@@ -46,7 +49,7 @@ void test_ascii(uint16_t c)
     stream.clear();
     stream.str(ref.s);
     out = "";
-    err = iod::json_to_utf8(stream, out);
+    err = json_to_utf8(stream, out);
     assert(err == 0);
     assert(out[0] == c and out.size() == 1);
   }
@@ -57,7 +60,7 @@ void test_ascii(uint16_t c)
     std::stringstream stream;
     stream << "\"\\u" << std::hex << std::setfill('0') << std::setw(4) << c << '"';
 
-    auto err = iod::json_to_utf8(stream, out);
+    auto err = json_to_utf8(stream, out);
     assert(err == 0);
     assert(out[0] == c and out.size() == 1);
   }
@@ -72,7 +75,7 @@ std::string json_to_utf8(std::string s)
 
   // c should convert to "c"
   //auto err = iod::json_to_utf8(stream, out);
-  auto err = iod::json_to_utf8(stream, out);
+  auto err = json_to_utf8(stream, out);
   // if (err.code)
   //   std::cerr << err.what << std::endl;
   assert(err == 0);
@@ -87,7 +90,7 @@ std::string utf8_to_json(std::string s)
   stream << s;
 
   // c should convert to "c"
-  auto err = iod::utf8_to_json(stream, out);
+  auto err = utf8_to_json(stream, out);
   // if (err)
   //   std::cerr << err.what << std::endl;
   assert(err == 0);
@@ -145,14 +148,14 @@ int main()
   { // Mix 7bits, 11bits, 16bits and 20bits (surrogate pair) codepoints.
     std::string out;
     std::stringstream stream("abc\xC2\xA2\xE2\x82\xAC\xF0\x90\x80\x81");    
-    auto err = iod::utf8_to_json(stream, out);
+    auto err = utf8_to_json(stream, out);
     assert(out == R"("abc\u00A2\u20AC\uD800\uDC01")");
   }
   
   { // Empty string.
     std::string out;
     std::stringstream stream("");
-    auto err = iod::utf8_to_json(stream, out);
+    auto err = utf8_to_json(stream, out);
     assert(out == "\"\"");
   }
   
@@ -160,7 +163,7 @@ int main()
   { // Empty string.
     std::string out;
     std::stringstream stream(R"("")");
-    auto err = iod::json_to_utf8(stream, out);
+    auto err = json_to_utf8(stream, out);
     assert(out == "");
   }
 
@@ -168,7 +171,7 @@ int main()
   {
     std::string out;
     std::stringstream stream(R"("\u000a")");
-    auto err = iod::json_to_utf8(stream, out);
+    auto err = json_to_utf8(stream, out);
     assert(err == 0);
     assert(out == "\x0a");
   }
@@ -177,7 +180,7 @@ int main()
   {
     std::string out;
     std::stringstream stream(R"("\u000A")");
-    auto err = iod::json_to_utf8(stream, out);
+    auto err = json_to_utf8(stream, out);
     assert(err == 0);
     assert(out == "\x0a");
   }

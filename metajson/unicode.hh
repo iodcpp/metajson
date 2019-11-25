@@ -2,17 +2,17 @@
 
 #include <cassert>
 #include <experimental/string_view>
-#include <iod/symbol/symbol.hh>
+
 #include <iod/metamap/metamap.hh>
 #include <iod/metajson/decode_stringstream.hh>
 
 #include <iod/metajson/error.hh>
+#include <iod/metajson/symbols.hh>
 
-namespace iod
-{
+namespace iod { namespace metajson {
 
-  IOD_SYMBOL(append);
-
+  using namespace ::iod::metamap;
+  
   template <typename O>
   inline decltype(auto) wrap_json_output_stream(O&& s)
   {
@@ -32,13 +32,13 @@ namespace iod
   inline decltype(auto)
   wrap_json_input_stream(std::stringstream& s) { return s; }
   inline decltype(auto)
-  wrap_json_input_stream(iod::decode_stringstream& s) { return s; }
+  wrap_json_input_stream(decode_stringstream& s) { return s; }
   inline decltype(auto)
   wrap_json_input_stream(const std::string& s) { return std::stringstream(s); }
   inline decltype(auto)
   wrap_json_input_stream(const char* s) { return std::stringstream(std::string(s)); }
   inline decltype(auto)
-  wrap_json_input_stream(const std::experimental::string_view& s) { return std::stringstream(std::string(s)); }
+  wrap_json_input_stream(const std::string_view& s) { return std::stringstream(std::string(s)); }
 
   namespace unicode_impl
   {
@@ -339,4 +339,4 @@ namespace iod
       return JSON_OK;
     }
   }
-}
+}}

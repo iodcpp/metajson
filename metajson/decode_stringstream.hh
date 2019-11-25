@@ -1,11 +1,11 @@
 #pragma once
 
-#include <experimental/string_view>
+#include <string_view>
 #include <cmath>
 
-namespace iod
-{
-  using std::experimental::string_view;
+namespace iod { namespace metajson {
+
+  using std::string_view;
   
   namespace internal
   {
@@ -204,4 +204,4 @@ namespace iod
     string_view buffer; //
   };
 
-}
+}}

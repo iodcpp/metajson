@@ -36,7 +36,7 @@ static void iod_custom_stream(benchmark::State& state) {
   {
     decode_stringstream ss(json_str);
     //std::stringstream ss = std::stringstream(std::string(json_str));
-    auto err = iod::json_decode(ss, obj);
+    auto err = iod::metajson::json_decode(ss, obj);
     //std::cout << err.what << std::endl;
   }
 }

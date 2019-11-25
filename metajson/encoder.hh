@@ -2,16 +2,16 @@
 
 #include <variant>
 #include <experimental/tuple>
-#include <experimental/string_view>
+#include <string_view>
 #include <iod/metamap/metamap.hh>
 #include <iod/symbol/symbol.hh>
 #include <iod/metajson/symbols.hh>
 #include <iod/metajson/utils.hh>
 #include <iod/metajson/unicode.hh>
 
-namespace iod
-{
-  using std::experimental::string_view;
+namespace iod { namespace metajson {
+
+  using std::string_view;
 
   template <typename... T>
   struct json_tuple_;
@@ -145,4 +145,4 @@ namespace iod
     }
   }
 
-}
+}}

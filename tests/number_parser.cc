@@ -4,11 +4,14 @@
 #include <iomanip>
 
 
+using namespace iod::metamap;
+using namespace iod::metajson;
+
 int test_integer(const char* str)
 {
   int f;
   const char* end;
-  iod::internal::parse_int(&f, str, &end);
+  iod::metajson::internal::parse_int(&f, str, &end);
 
   std::cout << f << std::endl;
   assert((end - str) == strlen(str));
@@ -19,7 +22,7 @@ double test_float(const char* str)
 {
   double f;
   const char* end;
-  iod::internal::parse_float(&f, str, &end);
+  iod::metajson::internal::parse_float(&f, str, &end);
   std::cout << std::string(str, end) << " -> " << std::setprecision(20)  << std::fixed << f << std::endl;
   assert((end - str) == strlen(str));
   return f;

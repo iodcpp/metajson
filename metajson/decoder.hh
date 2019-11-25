@@ -4,15 +4,15 @@
 #include <cstring>
 #include <utility>
 #include <variant>
-#include <experimental/string_view>
+#include <string_view>
 #include <iod/metamap/metamap.hh>
 #include <iod/metajson/utils.hh>
 #include <iod/metajson/unicode.hh>
 #include <iod/metajson/error.hh>
 #include <iod/metajson/decode_stringstream.hh>
 
-namespace iod
-{
+namespace iod { namespace metajson {
+
   namespace impl
   {
 
@@ -85,7 +85,7 @@ namespace iod
 
         if constexpr(std::is_floating_point<T>::value or
                      std::is_integral<T>::value or
-                     std::is_same<T, iod::string_view>::value
+                     std::is_same<T, std::string_view>::value
           ) {
             ss >> t;
             if (ss.bad())
@@ -320,4 +320,5 @@ namespace iod
 
   }
 
-}
+}}
+

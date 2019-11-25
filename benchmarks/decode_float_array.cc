@@ -23,11 +23,6 @@ const char* json_str = R"json([0.02e-3,1.024654e3,2.0246782e3,3.789402e3,4.02462
 
 using namespace iod;
 
-namespace s
-{
-  IOD_SYMBOL(test1);
-  IOD_SYMBOL(test2);
-}
 
 static void iod_custom_stream(benchmark::State& state) {
 
@@ -37,7 +32,7 @@ static void iod_custom_stream(benchmark::State& state) {
   {
     obj.clear();
     decode_stringstream ss(json_str);
-    auto err = iod::json_decode(ss, obj);
+    auto err = iod::metajson::json_decode(ss, obj);
   }
 }
 
