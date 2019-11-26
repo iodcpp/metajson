@@ -469,7 +469,7 @@ namespace iod
   }
 
   template <typename T, typename F>
-  void tuple_apply_each(F&& f, T&& t)
+  void tuple_reduce(F&& f, T&& t)
   {
     return std::experimental::apply([&] (auto&&... e) { apply_each(f, std::forward<decltype(e)>(e)...); },
                                     std::forward<T>(t));
@@ -675,7 +675,7 @@ namespace iod
             }
         };
 
-      tuple_apply_each(parse, e.args);
+      tuple_map(e.args, parse);
       return res;
     }
     
@@ -1719,7 +1719,7 @@ namespace iod
             json_encode_value(ss, symbol_member_or_getter_access(obj, e.name));
         };
 
-      tuple_apply_each(encode_one_entity, schema.schema);
+      tuple_map(schema.schema, encode_one_entity);
       ss << '}';
     }
   }

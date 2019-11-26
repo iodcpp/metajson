@@ -140,7 +140,7 @@ namespace iod {
             json_encode_value(ss, symbol_member_or_getter_access(obj, e.name));
         };
 
-      tuple_apply_each(encode_one_entity, schema.schema);
+      tuple_map(schema.schema, encode_one_entity);
       ss << '}';
     }
   }

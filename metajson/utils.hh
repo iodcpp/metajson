@@ -102,7 +102,7 @@ namespace iod {
             }
         };
 
-      ::iod::tuple_apply_each(parse, e.args);
+      ::iod::tuple_map(e.args, parse);
       return res;
     }
     
