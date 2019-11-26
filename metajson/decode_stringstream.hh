@@ -3,7 +3,7 @@
 #include <string_view>
 #include <cmath>
 
-namespace iod { namespace metajson {
+namespace iod {
 
   using std::string_view;
   
@@ -204,4 +204,4 @@ namespace iod { namespace metajson {
     string_view buffer; //
   };
 
-}}
+}

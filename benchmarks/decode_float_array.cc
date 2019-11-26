@@ -32,7 +32,7 @@ static void iod_custom_stream(benchmark::State& state) {
   {
     obj.clear();
     decode_stringstream ss(json_str);
-    auto err = iod::metajson::json_decode(ss, obj);
+    auto err = iod::json_decode(ss, obj);
   }
 }
 

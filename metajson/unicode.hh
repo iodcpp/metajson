@@ -9,9 +9,9 @@
 #include <iod/metajson/error.hh>
 #include <iod/metajson/symbols.hh>
 
-namespace iod { namespace metajson {
+namespace iod {
 
-  using namespace ::iod::metamap;
+  
   
   template <typename O>
   inline decltype(auto) wrap_json_output_stream(O&& s)
@@ -339,4 +339,4 @@ namespace iod { namespace metajson {
       return JSON_OK;
     }
   }
-}}
+}

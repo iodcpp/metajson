@@ -8,8 +8,8 @@ IOD_SYMBOL(id)
 
 int main ()
 {
-  using iod::metajson::json_encode;
-  using iod::metajson::json_decode;
+  using iod::json_encode;
+  using iod::json_decode;
 
   using iod::json_object;
   using iod::json_vector;
@@ -51,7 +51,7 @@ int main ()
 
 
   // Metamap
-  using iod::metamap::make_metamap;
+  using iod::make_metamap;
   auto map = make_metamap(s::age = 12, s::name = std::string("John"));
   json_str = json_encode(map);
   
@@ -61,7 +61,7 @@ int main ()
   json_decode(json_str, map);
 
 
-  std::cout << json_object(s::age, s::name(iod::metajson::json_key("last_name"))).encode(obj) << std::endl;
+  std::cout << json_object(s::age, s::name(iod::json_key("last_name"))).encode(obj) << std::endl;
   // {"age":12,"last_name":"John"}
 
 }

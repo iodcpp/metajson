@@ -5,5 +5,5 @@ const char* json_str = R"json([0.02e-3,1.024654e3,2.0246782e3,3.789402e3,4.02462
 int main()
 {
   auto obj = std::vector<float>();
-  return iod::metajson::json_decode(json_str, obj);
+  return iod::json_decode(json_str, obj);
 }

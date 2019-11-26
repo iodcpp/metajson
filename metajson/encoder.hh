@@ -9,7 +9,7 @@
 #include <iod/metajson/utils.hh>
 #include <iod/metajson/unicode.hh>
 
-namespace iod { namespace metajson {
+namespace iod {
 
   using std::string_view;
 
@@ -145,4 +145,4 @@ namespace iod { namespace metajson {
     }
   }
 
-}}
+}

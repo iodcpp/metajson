@@ -4,8 +4,9 @@
 IOD_SYMBOL(test1)
 IOD_SYMBOL(test2)
 
-using namespace iod::metamap;
-using namespace iod::metajson;
+
+
+using namespace iod;
 
 int main()
 {
@@ -94,7 +95,7 @@ int main()
     auto err = json_decode("{}", obj);
     assert(err.good());
     assert(!obj.test1.has_value());
-    err = iod::metajson::json_decode("{\"test1\": \"Hooh\"}", obj);
+    err = iod::json_decode("{\"test1\": \"Hooh\"}", obj);
     assert(err.good());
     assert(obj.test1.has_value());
     assert(obj.test1.value() == "Hooh");

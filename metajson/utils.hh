@@ -5,13 +5,13 @@
 #include <iod/symbol/ast.hh>
 #include <experimental/tuple>
 
-namespace iod { namespace metajson {
+namespace iod {
 
 
-  using iod::metamap::metamap;
-  using iod::metamap::make_metamap;
   
-  using namespace ::iod::symbol;
+  
+  
+  
   
   template <typename T>
   struct json_object_base;
@@ -27,7 +27,7 @@ namespace iod { namespace metajson {
     template <typename S, typename... A>
     auto make_json_object_member(const function_call_exp<S, A...>& e);
     template <typename S>
-    auto make_json_object_member(const iod::symbol::symbol<S>&);
+    auto make_json_object_member(const iod::symbol<S>&);
 
     template <typename S, typename T>
     auto make_json_object_member(const assign_exp<S, T>& e)
@@ -37,7 +37,7 @@ namespace iod { namespace metajson {
     }
 
     template <typename S>
-    auto make_json_object_member(const iod::symbol::symbol<S>&)
+    auto make_json_object_member(const iod::symbol<S>&)
     {
       return make_metamap(s::name = S{});
     }
@@ -102,7 +102,7 @@ namespace iod { namespace metajson {
             }
         };
 
-      ::iod::metamap::tuple_apply_each(parse, e.args);
+      ::iod::tuple_apply_each(parse, e.args);
       return res;
     }
     
@@ -135,4 +135,4 @@ namespace iod { namespace metajson {
   template <typename T>
   constexpr auto is_std_optional(T) -> std::false_type;
   
-}}
+}

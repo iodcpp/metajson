@@ -6,9 +6,9 @@
 #include <iod/metajson/encoder.hh>
 #include <iod/metajson/utils.hh>
 
-namespace iod { namespace metajson {
+namespace iod {
 
-using iod::metamap::metamap;
+
 
 template <typename T> struct json_object_base {
 
@@ -107,4 +107,4 @@ template <typename M> auto json_encode(const M& obj) {
   return impl::to_json_schema(obj).encode(obj);
 }
 
-}} // namespace iod
+} // namespace iod

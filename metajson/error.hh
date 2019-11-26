@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 
-namespace iod { namespace metajson {
+namespace iod {
 
 
   enum json_error_code
@@ -27,4 +27,4 @@ namespace iod { namespace metajson {
 
   static int json_ok = json_no_error();
 
-}}
+}

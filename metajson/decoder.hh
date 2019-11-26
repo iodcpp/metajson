@@ -11,7 +11,7 @@
 #include <iod/metajson/error.hh>
 #include <iod/metajson/decode_stringstream.hh>
 
-namespace iod { namespace metajson {
+namespace iod {
 
   namespace impl
   {
@@ -320,5 +320,5 @@ namespace iod { namespace metajson {
 
   }
 
-}}
+}
 

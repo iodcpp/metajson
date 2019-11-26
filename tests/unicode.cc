@@ -5,8 +5,8 @@
 
 #include <iod/metajson/unicode.hh>
 
-using namespace iod::metamap;
-using namespace iod::metajson;
+
+using namespace iod;
 
 struct R
 {

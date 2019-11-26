@@ -22,7 +22,7 @@ static void parse_float(benchmark::State& state) {
   double i = 0;
   while (state.KeepRunning())
   {
-    iod::internal::parse_float(&i, float_str, nullptr);
+    iod::parse_float(&i, float_str, nullptr);
   }
 
   std::cout << std::fixed << std::setprecision(20) << i << std::endl;
